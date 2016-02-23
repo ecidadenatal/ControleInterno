@@ -1,3 +1,3 @@
 # ControleInterno
 
-Plugin contendo alterações do e-cidade.
+Plugin contendo alterações do e-cidade
