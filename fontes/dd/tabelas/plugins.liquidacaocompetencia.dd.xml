@@ -1,0 +1,73 @@
+<?xml version="1.0" standalone="yes" ?>
+<table name="plugins.liquidacaocompetencia" description="Guarda registros da competencia (ano/mes) da liquidacao" prefix="" label="Liquidacao Competencia" type="0">
+ <fields>
+    <field name="sequencial"
+            conteudo="int4"
+            description="Sequencial"
+            inivalue="0"
+            label="Sequencial"
+            size="10"
+            null="f"
+            uppercase="f"
+            autocompl="f"
+            aceitatipo="1"
+            tipoobj="text"
+            labelrel="Sequencial"
+            reference=""
+            ispk="t"
+            hassequence="t">
+       <sequence name="plugins.liquidacaocompetencia_sequencial_seq"></sequence>
+    </field>
+    <field name="pagordem"
+           conteudo="int4"
+           description="Ordem de Pagamento"
+           inivalue="0"
+           label="Ordem de Pagamento"
+           size="4"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="OP"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>    
+    <field name="mes"
+           conteudo="int4"
+           description="Mês"
+           inivalue="0"
+           label="Mês"
+           size="4"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Mês"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="ano"
+           conteudo="int4"
+           description="Ano"
+           inivalue="0"
+           label="Ano"
+           size="6"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Ano"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>        
+  </fields>
+  <primarykey>
+    <fieldpk name="sequencial"></fieldpk>
+  </primarykey>
+</table>

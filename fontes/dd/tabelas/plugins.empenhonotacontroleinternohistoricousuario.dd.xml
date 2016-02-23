@@ -1,0 +1,78 @@
+<?xml version="1.0" standalone="yes" ?>
+<table name="plugins.empenhonotacontroleinternohistoricousuario" description="Guarda o chefe e diretor de cada histórico do controle interno." prefix="" label="Usuários de Histórico do Controle Interno." type="0">
+  <fields>
+    <field name="sequencial"
+           conteudo="int4"
+           description="Sequencial"
+           inivalue="0"
+           label="Sequencial"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Sequencial"
+           reference=""
+           ispk="t"
+           hassequence="t">
+      <sequence name="plugins.empenhonotacontroleinternohistoricousuario_sequencial_seq" ></sequence>
+    </field>
+    <field name="empenhonotacontroleinternohistorico"
+           conteudo="int4"
+           description="Histórico de Controle Interno"
+           inivalue="0"
+           label="Histórico de Controle Interno"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Histórico de Controle Interno"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="cgm_chefe"
+           conteudo="int4"
+           description="Usuário Chefe"
+           inivalue="0"
+           label="Usuário Chefe"
+           size="10"
+           null="t"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Usuário Chefe"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="cgm_diretor"
+           conteudo="int4"
+           description="Usuário Diretor"
+           inivalue="0"
+           label="Usuário Diretor"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Usuário Diretor"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+  </fields>
+  <primarykey>
+    <fieldpk  name="sequencial"></fieldpk>
+  </primarykey>
+  <foreignkeys>
+    <foreignkey reference="empenhonotacontroleinternohistorico" inner='true'>
+      <fieldfk name="empenhonotacontroleinternohistorico" reference="sequencial"></fieldfk>
+    </foreignkey>
+  </foreignkeys>
+</table>

@@ -1,0 +1,1 @@
+alter table plugins.empenhonotacontroleinternohistorico alter column usuario drop not null;

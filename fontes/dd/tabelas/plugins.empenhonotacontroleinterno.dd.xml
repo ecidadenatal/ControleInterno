@@ -1,0 +1,57 @@
+<?xml version="1.0" standalone="yes" ?>
+<table name="plugins.empenhonotacontroleinterno" description="Controle Interno." prefix="" label="Controle Interno." type="0">
+  <fields>
+    <field name="sequencial"
+           conteudo="int4"
+           description="Sequencial"
+           inivalue="0"
+           label="Sequencial"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Sequencial"
+           reference=""
+           ispk="t"
+           hassequence="t">
+      <sequence name="plugins.empenhonotacontroleinterno_sequencial_seq" ></sequence>
+    </field>
+    <field name="nota"
+           conteudo="int4"
+           description="Nota de Liquidação"
+           inivalue="0"
+           label="Nota de Liquidação"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Nota de Liquidação"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="situacao"
+           conteudo="int4"
+           description="Situação"
+           inivalue="0"
+           label="Situação"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Situação"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+  </fields>
+  <primarykey>
+    <fieldpk  name="sequencial"></fieldpk>
+  </primarykey>
+</table>
