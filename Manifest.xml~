@@ -25,6 +25,7 @@
       <file name="ControleInterno.model.php"    path="/model/empenho/ControleInterno.model.php" />
       <file name="ControleInternoMovimento.model.php"    path="/model/empenho/ControleInternoMovimento.model.php" />
       <file name="ControleInternoDocumentoAnalise.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnalise.model.php" />
+      <file name="ControleInternoDocumentoAnaliseHTML.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnaliseHTML.model.php" />
 
       <!-- outro -->
       <file name="ControleInterno.xml"    path="/modification/xml/ControleInterno.xml" />

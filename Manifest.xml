@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <plugin name="ControleInterno" label="Controle Interno" plugin-version="1.4" ecidade-version="2.3.37" id-modulo="398">
+  <plugin name="ControleInterno" label="Controle Interno" plugin-version="1.5" ecidade-version="2.3.37" id-modulo="398">
 
     <files>
 

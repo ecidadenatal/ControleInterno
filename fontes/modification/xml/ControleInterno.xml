@@ -8,9 +8,15 @@
       <search><![CDATA[/*[Extensao] - Controle Interno*/]]></search>
       <add position="after">
         <![CDATA[
+    $oPlugin       = new Plugin ( null, 'ControleInterno' );
+    $aConfiguracao = PluginService::getPluginConfig ( $oPlugin );
+    
+    $sInstituicoesSemAnalise = $aConfiguracao["InstituicaoSemAnalise"];
+    //$aInstituicoesSemAnalise = explode ( ",", $aConfiguracao["InstituicaoSemAnalise"] );
+
     $sWhere .= " and (exists(select 1 from plugins.empenhonotacontroleinterno ";
     $sWhere .= "              where nota = e71_codnota and situacao >= " . ControleInterno::SITUACAO_LIBERADO_DIRETOR . ")";
-    $sWhere .= ")";
+    $sWhere .= " or e60_instit in (".$sInstituicoesSemAnalise."))";
           ]]>
       </add>
     </operation>
