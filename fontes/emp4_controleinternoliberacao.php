@@ -193,7 +193,7 @@ if (!empty($oGet->filtrovalor)) {
     //utilizando função do próprio TinyMCE para pegar o conteúdo do campo de texto
     var ressalvaText   = tinyMCE.get('ressalva').getContent();
 
-    var sResalva       = ressalvaText;//$F('ressalva')
+    var sResalva       = ressalvaText;//$F('ressalva');
     var iSituacao      = $F('situacao');
     var iCodigoNota    = $F('nota');
     var iLiberacaoTipo = $F('liberacaoTipo');
@@ -224,12 +224,15 @@ if (!empty($oGet->filtrovalor)) {
               	
           	  var iHeight = (screen.availHeight - 40);
           	  var iWidth  = (screen.availWidth - 5);
-                var sOpcoes = 'width=' + iWidth + ',height=' + iHeight + ',scrollbars=1,location=0';
-                var sQuery  = '?iCodigoNota=' + iCodigoNota;
-                var oJanela = window.open("emp4_documentocontroleinterno002.php" + sQuery, '', sOpcoes);
-                
-                oJanela.moveTo(0, 0);
-                
+              var sOpcoes = 'width=' + iWidth + ',height=' + iHeight + ',scrollbars=1,location=0';
+              var sQuery  = '?iCodigoNota=' + iCodigoNota;
+              var oJanela = window.open("emp4_documentocontroleinterno002.php" + sQuery, '', sOpcoes);
+              
+              oJanela.moveTo(0, 0);
+              
+              if (!lErro) {
+                reiniciaJanela();
+              }
           	}
           	
           }
@@ -253,7 +256,6 @@ if (!empty($oGet->filtrovalor)) {
   }
 
   function js_mostra_empenho(iNumeroEmpenho, iCodigoNota, nValor) {
-
     $('empenho').value = iNumeroEmpenho;
     $('nota').value    = iCodigoNota;
     $('valor').value   = js_formatar(nValor, 'f');
