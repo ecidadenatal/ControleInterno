@@ -47,6 +47,7 @@
           <item name="Liberação Inicial Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=1&amp;filtrovalor=1" liberado-cliente="true" />
           <item name="Liberação Inicial" file="emp4_controleinternoliberacao.php?liberacaotipo=1" liberado-cliente="true" />
           <item name="Liberação Final" file="emp4_controleinternoliberacao.php?liberacaotipo=2" liberado-cliente="true" />
+          <item name="Liberação Final Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=2&amp;filtrovalor=1" liberado-cliente="true" />
           <item name="Emissão da Nota de Análise" file="emp4_documentocontroleinterno001.php" liberado-cliente="true" />
         </item>
       </menu>
