@@ -52,7 +52,7 @@
 
     $sCampos = " e69_codnota, e60_vlremp, e60_vlrliq, e60_vlranu ";
     $sOrdem  = " e69_codnota ";
-    $sWhere  = " e69_numemp = {$iNumeroEmpenho} ";
+    $sWhere  = " e69_numemp = {$iNumeroEmpenho} and (exists(select 1 from plugins.empenhonotacontroleinterno where nota = e69_codnota) or e70_vlranu = 0)";
 
     $oDaoEmpNota = new cl_empnota();
     $sSqlEmpNota = $oDaoEmpNota->sql_query_valor_financeiro(null, $sCampos, $sOrdem, $sWhere);
