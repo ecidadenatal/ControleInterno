@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <plugin name="ControleInterno" label="Controle Interno" plugin-version="1.5" ecidade-version="2.3.37" id-modulo="398">
+  <plugin name="ControleInterno" label="Controle Interno" plugin-version="1.6" ecidade-version="2.3.37" id-modulo="398">
 
     <files>
 
@@ -39,6 +39,7 @@
       <estrutura file="/versao_1_1.sql" version="1.1"/>
       <estrutura file="/versao_1_3.sql" version="1.3"/>
       <estrutura file="/versao_1_4.sql" version="1.4"/>
+      <estrutura file="/versao_1_6.sql" version="1.6"/>
     </estrutura>
 
     <menus>
@@ -47,6 +48,7 @@
           <item name="Liberação Inicial Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=1&amp;filtrovalor=1" liberado-cliente="true" />
           <item name="Liberação Inicial" file="emp4_controleinternoliberacao.php?liberacaotipo=1" liberado-cliente="true" />
           <item name="Liberação Final" file="emp4_controleinternoliberacao.php?liberacaotipo=2" liberado-cliente="true" />
+          <item name="Liberação Final Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=2&amp;filtrovalor=1" liberado-cliente="true" />
           <item name="Emissão da Nota de Análise" file="emp4_documentocontroleinterno001.php" liberado-cliente="true" />
         </item>
       </menu>

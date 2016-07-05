@@ -109,7 +109,14 @@ $Se60_numemp = "Seq. Empenho";
       }
 
       if (!empty($filtrar_notas_para_analista)) {
-        $aWhere[] =  "(situacao < " . ControleInterno::SITUACAO_LIBERADO_DIRETOR . " or situacao is null)";
+        $aWhere[] = "(situacao = " . ControleInterno::SITUACAO_AGUARDANDO_ANALISE . " or situacao is null 
+                      or (select situacao_aprovacao from plugins.controleinternocredor
+                                              inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
+                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial) = ". ControleInterno::SITUACAO_REJEITADA ."
+                      or (select situacao_aprovacao from plugins.controleinternocredor
+                                              inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
+                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial
+                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.")) = ". ControleInterno::SITUACAO_APROVADA .")";
       }
 
       if (!empty($chave_e60_codemp)) {
@@ -128,7 +135,7 @@ $Se60_numemp = "Seq. Empenho";
       }
 
       if(!empty($filtrar_para_emissao)) {
-        $aWhere[] = "situacao >= " . ControleInterno::SITUACAO_REJEITADO_ANALISTA;
+        $aWhere[] = "situacao >= " . ControleInterno::SITUACAO_REJEITADA;
       }
 
       if (!empty($chave_e60_numemp)) {
@@ -143,15 +150,24 @@ $Se60_numemp = "Seq. Empenho";
         $aWhere[] = "e71_codord = {$chave_e71_codord}";
       }
 
+      if (isset($iCredor)) {
+        $sWhereCredor  = " exists(select 1 from empautoriza ";
+        $sWhereCredor .= "                  inner join empempaut on e61_autori = e54_autori";
+        $sWhereCredor .= " where e61_numemp = empempenho.e60_numemp and e54_numcgm = {$iCredor}) ";
+        $aWhere[] = $sWhereCredor;
+      }
+
       $oDaoEmpenhoControleInterno =  new cl_empenhonotacontroleinterno();
       $sWhere   = implode(" and ", $aWhere);
 
       $sCampos   = "e60_numemp, e60_codemp, e71_codord, e60_anousu, z01_nome, e69_numero, e69_codnota, e69_codnota as db_e69_codnota, e60_vlremp, e70_vlrliq,";
-      $sCampos  .= " (case when situacao = " . ControleInterno::SITUACAO_REJEITADO_ANALISTA . "  then 'Rejeitado pelo Analista' ";
-      $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_LIBERADO_ANALISTA . "   then 'Liberado pelo Analista' ";
-      $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_REJEITADO_DIRETOR . "   then 'Rejeitado pelo Diretor' ";
-      $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_LIBERADO_DIRETOR . "    then 'Liberado pelo Diretor' ";
+      $sCampos  .= " (case when situacao = " . ControleInterno::SITUACAO_DILIGENCIA          . " then 'Diligência' ";
+      $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_REGULAR             . " then 'Regular' ";
+      $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_REJEITADA           . " then 'Rejeitado pelo Diretor' ";
+      $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_APROVADA            . " then 'Liberado pelo Diretor' ";
       $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_LIBERADO_AUTOMATICO . " then 'Liberação Automática' ";
+      $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_RESSALVA            . " then 'Ressalva' ";
+      $sCampos  .= "       when situacao = " . ControleInterno::SITUACAO_IRREGULAR           . " then 'Irregular' ";
       $sCampos  .= "       when situacao is null then 'Aguardando análise' end)::varchar as dl_Situação ";
       //comentado porque ao utilizar o html na ressalva, as linhas não apareciam corretamente
       /*$sCampos  .= "(select controlehistorico.ressalva::text
@@ -163,7 +179,7 @@ $Se60_numemp = "Seq. Empenho";
       $repassa   = array();
       $sOrder    = "e60_anousu desc, e60_codemp::int, situacao desc";
       $sSqlNotas = $oDaoEmpenhoControleInterno->sql_query_empenhos_para_controle_interno($sCampos , $sOrder, $sWhere);
-      
+
       db_lovrot($sSqlNotas, 15, "()", "", $funcao_js, "", "NoMe", $repassa, false); ?>
     </td>
   </tr>

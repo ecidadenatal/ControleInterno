@@ -1,0 +1,57 @@
+<?xml version="1.0" standalone="yes" ?>
+<table name="plugins.controleinternocredor_empenhonotacontroleinterno" description="Vínculo entre controle interno credor e controle interno." prefix="" label="Controle Interno." type="0">
+  <fields>
+    <field name="sequencial"
+           conteudo="int4"
+           description="Sequencial"
+           inivalue="0"
+           label="Sequencial"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Sequencial"
+           reference=""
+           ispk="t"
+           hassequence="t">
+      <sequence name="plugins.controleinternocredor_empenhonotacontroleinterno_sequencial_seq" ></sequence>
+    </field>
+    <field name="controleinternocredor"
+           conteudo="int4"
+           description="Controle interno credor"
+           inivalue="0"
+           label="Controle interno credor"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Controle interno credor"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="empenhonotacontroleinterno"
+           conteudo="int4"
+           description="Nota de Análise"
+           inivalue="0"
+           label="Nota de Análise"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Nota de Análise"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+  </fields>
+  <primarykey>
+    <fieldpk  name="sequencial"></fieldpk>
+  </primarykey>
+</table>

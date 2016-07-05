@@ -33,12 +33,15 @@ abstract class ControleInterno {
   /**
    * Tipos de situacao
    */
+
   const SITUACAO_AGUARDANDO_ANALISE  = 1;
-  const SITUACAO_REJEITADO_ANALISTA  = 2;
-  const SITUACAO_LIBERADO_ANALISTA   = 3;
-  const SITUACAO_REJEITADO_DIRETOR   = 4;
-  const SITUACAO_LIBERADO_DIRETOR    = 5;
+  const SITUACAO_DILIGENCIA          = 2;
+  const SITUACAO_REGULAR             = 3;
+  const SITUACAO_REJEITADA           = 4;
+  const SITUACAO_APROVADA            = 5;
   const SITUACAO_LIBERADO_AUTOMATICO = 6;
+  const SITUACAO_RESSALVA            = 7;
+  const SITUACAO_IRREGULAR           = 8;
 
   const CONTROLE_ANALISTA = 1;
   const CONTROLE_DIRETOR  = 2;
@@ -202,8 +205,8 @@ abstract class ControleInterno {
     $oControleInterno = new ControleInternoMovimento($iCodigoNota);
 
     $aLiberacao = array(
-      self::SITUACAO_LIBERADO_ANALISTA,
-      self::SITUACAO_LIBERADO_DIRETOR,
+      self::SITUACAO_REGULAR,
+      self::SITUACAO_APROVADA,
       self::SITUACAO_LIBERADO_AUTOMATICO
     );
     if (in_array($oControleInterno->getSituacaoFinal(), $aLiberacao)) {

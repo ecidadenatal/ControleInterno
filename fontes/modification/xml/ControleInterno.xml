@@ -15,7 +15,7 @@
     //$aInstituicoesSemAnalise = explode ( ",", $aConfiguracao["InstituicaoSemAnalise"] );
 
     $sWhere .= " and (exists(select 1 from plugins.empenhonotacontroleinterno ";
-    $sWhere .= "              where nota = e71_codnota and situacao >= " . ControleInterno::SITUACAO_LIBERADO_DIRETOR . ")";
+    $sWhere .= "              where nota = e71_codnota and situacao >= " . ControleInterno::SITUACAO_APROVADA . ")";
     $sWhere .= " or e60_instit in (".$sInstituicoesSemAnalise."))";
           ]]>
       </add>
@@ -77,7 +77,7 @@
 
     //Verifica se a primeira liquidação já foi liberada.
     $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
-    if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() < ControleInterno::SITUACAO_LIBERADO_DIRETOR) {
+    if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() < ControleInterno::SITUACAO_APROVADA) {
       return;
     }
 

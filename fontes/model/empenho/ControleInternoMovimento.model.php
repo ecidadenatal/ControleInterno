@@ -99,13 +99,13 @@ class ControleInternoMovimento extends ControleInterno {
     $rsDadosUsuario   = db_query($sSqlDadosUsuario);
     $oDadosUsuario    = db_utils::fieldsMemory($rsDadosUsuario, 0);
 
-    if (in_array($iSituacao, array(ControleInterno::SITUACAO_LIBERADO_ANALISTA, ControleInterno::SITUACAO_REJEITADO_ANALISTA))) {
+    if (in_array($iSituacao, array(ControleInterno::SITUACAO_REGULAR, ControleInterno::SITUACAO_DILIGENCIA))) {
       
       $oDaoHistoricoUsuario->empenhonotacontroleinternohistorico = $oDadosUsuario->codigohistorico;
       $oDaoHistoricoUsuario->cgm_chefe = $oDadosUsuario->chefe;
       $oDaoHistoricoUsuario->cgm_diretor = $oDadosUsuario->diretor;      
     
-    } else if (in_array($iSituacao, array(ControleInterno::SITUACAO_LIBERADO_DIRETOR, ControleInterno::SITUACAO_REJEITADO_DIRETOR))) {
+    } else if (in_array($iSituacao, array(ControleInterno::SITUACAO_APROVADA, ControleInterno::SITUACAO_REJEITADA))) {
     
       $oDaoHistoricoUsuario->empenhonotacontroleinternohistorico = $oDadosUsuario->codigohistorico;
       $oDaoHistoricoUsuario->cgm_chefe = null;
