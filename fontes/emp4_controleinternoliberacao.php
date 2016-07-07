@@ -88,6 +88,15 @@ if (!empty($oGet->filtrovalor)) {
       <legend><strong>Controle Interno - Liberação <?=$sTituloTipo?> de Empenho</strong></legend>
       <table>        
         <tr> 
+          <td  align="left" nowrap><strong>Órgão/Unidade: </strong></td>
+          <td align="left" nowrap>
+            <? 
+              db_input("orgao",1,1,true,"text",1, "", "", "", "", 2);  
+              db_input("unidade",1,1,true,"text",1, "", "", "", "", 2);  
+            ?>
+          </td>
+        </tr>
+        <tr> 
           <td  align="left" nowrap title="<?=$Tz01_numcgm?>"><?db_ancora('<b>Credor:</b>',"js_pesquisa_cgm(true);",1);?></td>
           <td align="left" nowrap>
             <? 
@@ -224,9 +233,9 @@ if (!empty($oGet->filtrovalor)) {
               var iHeight = (screen.availHeight - 40);
               var iWidth  = (screen.availWidth - 5);
               var sOpcoes = 'width=' + iWidth + ',height=' + iHeight + ',scrollbars=1,location=0';
-              var sQuery  = '?iCodigoNota=' + iCodigoNota;
-              var oJanela = window.open("emp4_documentocontroleinterno002.php" + sQuery, '', sOpcoes);
-              
+              var sQuery  = '?iNumeroInstrucao=' + oRetorno.iCodigoAnalise;
+              var oJanela = window.open("emp4_documentocontroleinterno_002_natal.php" + sQuery, '', sOpcoes);
+
               oJanela.moveTo(0, 0);
             }
             reiniciaJanela();
@@ -243,19 +252,21 @@ if (!empty($oGet->filtrovalor)) {
    */
   function reiniciaJanela() {
 
+    removerTodasLiquidacoes();
+    tinyMCE.get('ressalva').setContent('');
     var oComboSituacao = $('situacao');
 
     oComboSituacao.value            = oComboSituacao.options[1];
+    $('orgao').value                = '';
+    $('unidade').value              = '';
     $('z01_numcgm').value           = '';
     $('z01_nome2').value            = '';
-    $('ressalva').value             = '';
     $('liquidacao_numero').value    = '';
     $('empenho_codigo').value       = '';
     $('liquidacao_descricao').value = '';
     $('liquidacao_valor').value     = '';
 
     js_pesquisa_cgm(true);
-    removerTodasLiquidacoes();
   }
 
   /**
@@ -264,15 +275,17 @@ if (!empty($oGet->filtrovalor)) {
    */
   function buscarLiquidacao(lMostrar) {
 
-    var iCredor = $F('z01_numcgm');
+    var iCredor  = $F('z01_numcgm');
+    var iOrgao   = $F('orgao');
+    var iUnidade = $F('unidade');
 
-    if (iCredor == '') {
+    if (iCredor == '' || iOrgao == '' || iUnidade == '') {
 
-      alert("Para selecionar uma liquidação, você deve primeiro informar o credor.");
+      alert("Para selecionar uma liquidação, você deve preencher todos os filtros.");
       return false;
     }
 
-    var sQuerySringAdicional  = 'filtrar_notas_para_analista=1&iCredor=' + iCredor;
+    var sQuerySringAdicional  = 'filtrar_notas_para_analista=1&iCredor='+ iCredor +'&iOrgao='+ iOrgao +'&iUnidade='+ iUnidade;
     var sQuerySring           = sQuerySringAdicional + '&funcao_js=parent.retornoLiquidacao|e69_codnota|e60_numemp|z01_nome|e70_vlrliq';
     var sArquivo              = 'func_controleinternoliquidacoes.php';
     var sTituloTela           = 'Pesquisar Liquidação';
@@ -292,7 +305,7 @@ if (!empty($oGet->filtrovalor)) {
    */
   function retornoLiquidacao(iCodigo, iCodigoEmpenho, sDescricao, nValor, lErro) {
     db_iframe_empempenho.hide();
-    retorno('liquidacao', iCodigo, sDescricao, lErro, false);
+    retorno('liquidacao', iCodigo, sDescricao, nValor, lErro, false);
     $('empenho_codigo').value   = iCodigoEmpenho;
   }
 
@@ -304,13 +317,13 @@ if (!empty($oGet->filtrovalor)) {
    * @param {boolean} lErro             Se ocorreu erro.
    * @param {boolean} lLimpaLiquidacoes Se deve limpar as liquidações.
    */
-  function retorno(sCampo, iCodigo, sDescricao, lErro, lLimpaLiquidacoes) {
+  function retorno(sCampo, iCodigo, sDescricao, nValor, lErro, lLimpaLiquidacoes) {
 
     //Verifica se deve remover todas as liquidações.
     if (lLimpaLiquidacoes && $(sCampo + '_numero').value != iCodigo) {
       removerTodasLiquidacoes();
     }
-
+    $(sCampo+'_valor').value = nValor;
     $(sCampo+'_numero').value = iCodigo;
     if (lErro) {
       $(sCampo+'_numero').value = '';

@@ -72,13 +72,13 @@ try {
       $iNumCgm   = $oParam->iNumCgm;
       $aNotas    = $oParam->aNotas;
       $oUsuario  = new UsuarioSistema(db_getsession('DB_id_usuario'));
-      $oUsuarioControladoria = db_utils::fieldsMemory(db_query("select * from plugins.usuariocontroladoria where numcgm = {$oUsuario->getCodigo()}"), 0);
+      $oUsuarioControladoria = db_utils::fieldsMemory(db_query("select * from plugins.usuariocontroladoria where numcgm = (select cgmlogin from db_usuacgm where id_usuario = {$oUsuario->getCodigo()})"), 0);
 
       $oControleInternoCredor = db_utils::getDao("controleinternocredor");
       $oControleInternoCredor->sequencial            = null;
       $oControleInternoCredor->numcgm_credor         = $iNumCgm;
       $oControleInternoCredor->parecer               = $sRessalva;
-      $oControleInternoCredor->usuario_analise       = $oUsuario->getCodigo();
+      $oControleInternoCredor->usuario_analise       = $oUsuarioControladoria->numcgm;
       $oControleInternoCredor->data_analise          = date('d/m/Y', db_getsession('DB_datausu'));
       $oControleInternoCredor->situacao_analise      = $iSituacao;
       $oControleInternoCredor->usuario_diretor_atual = $oUsuarioControladoria->diretor;
@@ -177,6 +177,7 @@ try {
 
       $sMensagem = $sMensagem . (!empty($sMensagemLiberacao) ? "\n\n{$sMensagemLiberacao}" : "");
 
+      $oRetorno->iCodigoAnalise = $oControleInternoCredor->sequencial;
       $oRetorno->message = urlencode($sMensagem);
 
       break;

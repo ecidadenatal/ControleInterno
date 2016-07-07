@@ -81,9 +81,9 @@ if (!empty($oGet->filtrovalor)) {
           </td>
           <td>
             <?php
-              $aExercicio = db_getsession("DB_anousu");
-              $ano_inicio = $aExercicio - 2;
-              db_select("exercicio", array_combine(range($ano_inicio, $aExercicio), range($ano_inicio, $aExercicio)), true, 1, "style='width: 80px;'");  
+              $exercicio  = db_getsession("DB_anousu");
+              $ano_inicio = $exercicio - 2;
+              db_select("exercicio", array_combine(range($ano_inicio, $exercicio), range($ano_inicio, $exercicio)), true, 1, "style='width: 80px;'");  
             ?>
           </td>
         </tr>

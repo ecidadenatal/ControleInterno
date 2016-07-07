@@ -38,11 +38,11 @@ descricao text,
 tipo text 
 );
 
-insert into plugins.controleinternosituacoes select 1, 'Aguardando AnÃ¡lise', null;
-insert into plugins.controleinternosituacoes select 2, 'DiligÃªncia', 'Analista';
+insert into plugins.controleinternosituacoes select 1, 'Aguardando Análise', null;
+insert into plugins.controleinternosituacoes select 2, 'Diligência', 'Analista';
 insert into plugins.controleinternosituacoes select 3, 'Regular', 'Analista';
 insert into plugins.controleinternosituacoes select 4, 'Rejeitada pelo Diretor', 'Diretor';
 insert into plugins.controleinternosituacoes select 5, 'Aprovada pelo Diretor', 'Diretor';
-insert into plugins.controleinternosituacoes select 6, 'LiberaÃ§Ã£o AutomÃ¡tica', null;
+insert into plugins.controleinternosituacoes select 6, 'Liberação Automática', null;
 insert into plugins.controleinternosituacoes select 7, 'Ressalva', 'Analista';
 insert into plugins.controleinternosituacoes select 8, 'Irregular', 'Analista';

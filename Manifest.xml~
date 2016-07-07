@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <plugin name="ControleInterno" label="Controle Interno" plugin-version="1.6" ecidade-version="2.3.37" id-modulo="398">
+  <plugin name="ControleInterno" label="Controle Interno" plugin-version="1.6" ecidade-version="2.3.50" id-modulo="398">
 
     <files>
 
@@ -15,11 +15,17 @@
       <file name="db_empenhonotacontroleinternohistorico_classe.php"    path="/classes/db_empenhonotacontroleinternohistorico_classe.php" />
       <file name="db_liquidacaocompetencia_classe.php"    path="/classes/db_liquidacaocompetencia_classe.php" />
       <file name="db_empenhonotacontroleinternohistoricousuario_classe.php"    path="/classes/db_empenhonotacontroleinternohistoricousuario_classe.php" />
+      <file name="db_controleinternocredor_classe.php"    path="/classes/db_controleinternocredor_classe.php" />
+      <file name="db_controleinternocredor_empenhonotacontroleinterno_classe.php"    path="/classes/db_controleinternocredor_empenhonotacontroleinterno_classe.php" />
+      <file name="db_controleinternosituacoes_classe.php"    path="/classes/db_controleinternosituacoes_classe.php" />
 
       <file name="empenhonotacontroleinterno.dd.xml"    path="/dd/tabelas/plugins.empenhonotacontroleinterno.dd.xml" />
       <file name="empenhonotacontroleinternohistorico.dd.xml"    path="/dd/tabelas/plugins.empenhonotacontroleinternohistorico.dd.xml" />
       <file name="liquidacaocompetencia.dd.xml"    path="/dd/tabelas/plugins.liquidacaocompetencia.dd.xml" />
       <file name="empenhonotacontroleinternohistoricousuario.dd.xml"    path="/dd/tabelas/plugins.empenhonotacontroleinternohistoricousuario.dd.xml" />
+      <file name="controleinternocredor.dd.xml"    path="/dd/tabelas/plugins.controleinternocredor.dd.xml" />
+      <file name="controleinternosituacoes.dd.xml"    path="/dd/tabelas/plugins.controleinternosituacoes.dd.xml" />
+      <file name="controleinternocredor_empenhonotacontroleinterno.dd.xml"    path="/dd/tabelas/plugins.controleinternocredor_empenhonotacontroleinterno.dd.xml" />
 
       <!-- model -->
       <file name="ControleInterno.model.php"    path="/model/empenho/ControleInterno.model.php" />
@@ -30,6 +36,7 @@
       <!-- outro -->
       <file name="ControleInterno.xml"    path="/modification/xml/ControleInterno.xml" />
       <file name="emp4_controleinternoliberacao.php"    path="/emp4_controleinternoliberacao.php" />
+      <file name="emp4_controleinternoaprovacao.php"    path="/emp4_controleinternoaprovacao.php" />
       <file name="emp4_documentocontroleinterno002.php"    path="/emp4_documentocontroleinterno002.php" />
       <file name="emp4_documentocontroleinterno001.php"    path="/emp4_documentocontroleinterno001.php" />
 
@@ -45,10 +52,8 @@
     <menus>
       <menu type="4">
         <item name="Controle Interno" file="" liberado-cliente="true" >
-          <item name="Liberação Inicial Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=1&amp;filtrovalor=1" liberado-cliente="true" />
-          <item name="Liberação Inicial" file="emp4_controleinternoliberacao.php?liberacaotipo=1" liberado-cliente="true" />
-          <item name="Liberação Final" file="emp4_controleinternoliberacao.php?liberacaotipo=2" liberado-cliente="true" />
-          <item name="Liberação Final Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=2&amp;filtrovalor=1" liberado-cliente="true" />
+          <item name="Análise" file="emp4_controleinternoliberacao.php" liberado-cliente="true" />
+          <item name="Aprovação" file="emp4_controleinternoaprovacao.php" liberado-cliente="true" />
           <item name="Emissão da Nota de Análise" file="emp4_documentocontroleinterno001.php" liberado-cliente="true" />
         </item>
       </menu>

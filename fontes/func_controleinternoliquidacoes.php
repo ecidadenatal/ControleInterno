@@ -109,14 +109,15 @@ $Se60_numemp = "Seq. Empenho";
       }
 
       if (!empty($filtrar_notas_para_analista)) {
-        $aWhere[] = "(situacao = " . ControleInterno::SITUACAO_AGUARDANDO_ANALISE . " or situacao is null 
+        $aWhere[] = "((situacao = " . ControleInterno::SITUACAO_AGUARDANDO_ANALISE . " or situacao is null ) and
+                     (e69_codnota not in (select nota from plugins.empenhonotacontroleinterno)
                       or (select situacao_aprovacao from plugins.controleinternocredor
                                               inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
                                                                                                                  and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial) = ". ControleInterno::SITUACAO_REJEITADA ."
                       or (select situacao_aprovacao from plugins.controleinternocredor
                                               inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
                                                                                                                  and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial
-                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.")) = ". ControleInterno::SITUACAO_APROVADA .")";
+                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.")) = ". ControleInterno::SITUACAO_APROVADA ."))";
       }
 
       if (!empty($chave_e60_codemp)) {
@@ -155,6 +156,10 @@ $Se60_numemp = "Seq. Empenho";
         $sWhereCredor .= "                  inner join empempaut on e61_autori = e54_autori";
         $sWhereCredor .= " where e61_numemp = empempenho.e60_numemp and e54_numcgm = {$iCredor}) ";
         $aWhere[] = $sWhereCredor;
+      }
+
+      if (isset($iOrgao) && isset($iUnidade)) {
+        $aWhere[] = "o58_orgao = {$iOrgao} and o58_unidade = {$iUnidade}";
       }
 
       $oDaoEmpenhoControleInterno =  new cl_empenhonotacontroleinterno();

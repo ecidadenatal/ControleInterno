@@ -102,6 +102,10 @@ require_once("dbforms/db_funcoes.php");
         $aWhere[] = "(situacao_aprovacao is null and situacao_analise is not null )";
       }
 
+      if (!empty($emiterelatorio)) {
+        $aWhere[] = "(situacao_analise is not null )"; 
+      }
+
       if (!empty($iOrgao)) {
         $aWhere[] = "o58_orgao = {$iOrgao}";
       }
