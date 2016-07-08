@@ -52,9 +52,10 @@ try {
         
         // Salva os dados de aprovação na controleinternocredor
         $oUsuario  = new UsuarioSistema(db_getsession('DB_id_usuario'));
-        
+        $oUsuarioControladoria = db_utils::fieldsMemory(db_query("select * from plugins.usuariocontroladoria where numcgm = (select cgmlogin from db_usuacgm where id_usuario = {$oUsuario->getCodigo()})"), 0);
+
         $oDaoControleInternoCredor = db_utils::getDao("controleinternocredor");
-        $oDaoControleInternoCredor->aprovarAnalise($iCodigoAnalise, $oUsuario->getCodigo(), date('d/m/Y', db_getsession('DB_datausu')), $iSituacao);
+        $oDaoControleInternoCredor->aprovarAnalise($iCodigoAnalise, $oUsuarioControladoria->numcgm, date('d/m/Y', db_getsession('DB_datausu')), $iSituacao);
         
         if ($oDaoControleInternoCredor->erro_status == "0") {
           throw new Exception("Erro ao alterar a análise {$iCodigoAnalise}.");

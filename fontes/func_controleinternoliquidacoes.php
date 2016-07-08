@@ -109,8 +109,7 @@ $Se60_numemp = "Seq. Empenho";
       }
 
       if (!empty($filtrar_notas_para_analista)) {
-        $aWhere[] = "((situacao = " . ControleInterno::SITUACAO_AGUARDANDO_ANALISE . " or situacao is null ) and
-                     (e69_codnota not in (select nota from plugins.empenhonotacontroleinterno)
+        $aWhere[] = "((not exists (select 1 from plugins.empenhonotacontroleinterno where nota = e69_codnota and situacao != ".ControleInterno::SITUACAO_REJEITADA.")
                       or (select situacao_aprovacao from plugins.controleinternocredor
                                               inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
                                                                                                                  and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial) = ". ControleInterno::SITUACAO_REJEITADA ."
