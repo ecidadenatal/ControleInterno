@@ -36,14 +36,11 @@ $oGet   = db_utils::postMemory($_GET);
 $oGet            = db_utils::postMemory($_GET);
 $sStyleInputText = 'width:25%;';
 
-$sTituloTipo = " Inicial ";
-if ($oGet->liberacaotipo == 2) {
-  $sTituloTipo = " Final ";
-}
-
 $sFiltroValor = "";
+$lFiltroValor = false;
 if (!empty($oGet->filtrovalor)) {
   $sFiltroValor = "&filtrarvalor=1";
+  $lFiltroValor = true;
 }
 
 ?>
@@ -356,6 +353,7 @@ if (!empty($oGet->filtrovalor)) {
     oParam.iUnidade   = iUnidade;
     oParam.iAnalise   = iAnalise;
     oParam.iExercicio = iExercicio;
+    oParam.lFiltrarValor = "<?php echo $lFiltroValor  ?>";
 
     js_divCarregando('Aguarde, buscando análises', 'msgBox');
     var oAjax = new Ajax.Request(sUrl,
@@ -427,7 +425,7 @@ if (!empty($oGet->filtrovalor)) {
       var sQueryStringAdicional = sQueryStringAdicional + '&iUnidade=' + iUnidade;
     }
 
-    var sQueryString           = sQueryStringAdicional + '&funcao_js=parent.retornoanalise|0|3|2|6';
+    var sQueryString           = sQueryStringAdicional + '<?php echo $sFiltroValor; ?>&funcao_js=parent.retornoanalise|0|3|2|6';
     var sArquivo              = 'func_controleinternocredor.php';
     var sTituloTela           = 'Pesquisar Análise';
     if (!lMostrar) {

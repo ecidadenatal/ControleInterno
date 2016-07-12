@@ -33,14 +33,8 @@ require_once "libs/db_app.utils.php";
 require_once "dbforms/db_funcoes.php";
 
 $oGet   = db_utils::postMemory($_GET);
-$oGet            = db_utils::postMemory($_GET);
 $sStyleInputText = 'width:25%;';
 $iOpcao = 1;
-
-$sTituloTipo = " Inicial ";
-if ($oGet->liberacaotipo == 2) {
-  $sTituloTipo = " Final ";
-}
 
 $sFiltroValor = "";
 if (!empty($oGet->filtrovalor)) {
@@ -83,9 +77,9 @@ if (!empty($oGet->filtrovalor)) {
 <body class="body-default">
 <div class="container">
   <form id="formLiberacaoEmpenho">
-    <input id="liberacaoTipo" type="hidden" value="<?= $oGet->liberacaotipo?>">
+    <input id="liberacaoTipo" type="hidden" >
     <fieldset>
-      <legend><strong>Controle Interno - Liberação <?=$sTituloTipo?> de Empenho</strong></legend>
+      <legend><strong>Controle Interno - Liberação de Empenho</strong></legend>
       <table>        
         <tr> 
           <td  align="left" nowrap><strong>Órgão/Unidade: </strong></td>
@@ -233,8 +227,8 @@ if (!empty($oGet->filtrovalor)) {
               var iHeight = (screen.availHeight - 40);
               var iWidth  = (screen.availWidth - 5);
               var sOpcoes = 'width=' + iWidth + ',height=' + iHeight + ',scrollbars=1,location=0';
-              var sQuery  = '?iNumeroInstrucao=' + oRetorno.iCodigoAnalise;
-              var oJanela = window.open("emp4_documentocontroleinterno_002_natal.php" + sQuery, '', sOpcoes);
+              var sQuery  = '?iCodigoNota=' + iCodigoNota;
+              var oJanela = window.open("emp4_documentocontroleinterno002.php" + sQuery, '', sOpcoes);
 
               oJanela.moveTo(0, 0);
             }
@@ -286,11 +280,11 @@ if (!empty($oGet->filtrovalor)) {
     }
 
     var sQuerySringAdicional  = 'filtrar_notas_para_analista=1&iCredor='+ iCredor +'&iOrgao='+ iOrgao +'&iUnidade='+ iUnidade;
-    var sQuerySring           = sQuerySringAdicional + '&funcao_js=parent.retornoLiquidacao|e69_codnota|e60_numemp|z01_nome|e70_vlrliq';
+    var sQuerySring           = sQuerySringAdicional + '<?php echo $sFiltroValor; ?>&funcao_js=parent.retornoLiquidacao|e69_codnota|e60_numemp|z01_nome|e70_vlrliq';
     var sArquivo              = 'func_controleinternoliquidacoes.php';
     var sTituloTela           = 'Pesquisar Liquidação';
     if (!lMostrar) {
-      sQuerySring = 'pesquisa_chave=' + $F('liquidacao_numero') + '&' + sQuerySringAdicional + '&funcao_js=parent.retornoLiquidacao';
+      sQuerySring = 'pesquisa_chave=' + $F('liquidacao_numero') + '&' + sQuerySringAdicional + '<?php echo $sFiltroValor; ?>&funcao_js=parent.retornoLiquidacao';
     }
     js_OpenJanelaIframe('', 'db_iframe_empempenho', sArquivo + '?' + sQuerySring, sTituloTela, lMostrar);
   }

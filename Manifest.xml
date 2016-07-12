@@ -56,8 +56,10 @@
     <menus>
       <menu type="4">
         <item name="Controle Interno" file="" liberado-cliente="true" >
-          <item name="Análise" file="emp4_controleinternoliberacao.php" liberado-cliente="true" />
-          <item name="Aprovação" file="emp4_controleinternoaprovacao.php" liberado-cliente="true" />
+          <item name="Análise UTCI" file="emp4_controleinternoliberacao.php?filtrovalor=1" liberado-cliente="true" />
+          <item name="Análise CGM" file="emp4_controleinternoliberacao.php" liberado-cliente="true" />
+          <item name="Aprovação UTCI" file="emp4_controleinternoaprovacao.php?filtrovalor=1" liberado-cliente="true" />
+          <item name="Aprovação CGM" file="emp4_controleinternoaprovacao.php" liberado-cliente="true" />
           <item name="Emissão da Nota de Análise" file="emp4_documentocontroleinterno001.php" liberado-cliente="true" />
           <item name="Emissão da Nota de Análise (novo)" file="emp4_documentocontroleinterno_001_natal.php" liberado-cliente="true" />
         </item>

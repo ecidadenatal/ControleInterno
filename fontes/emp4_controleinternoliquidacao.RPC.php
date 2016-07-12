@@ -307,6 +307,10 @@ try {
         $sWhere .= " and o58_unidade = {$oParam->iUnidade}";
       }
 
+      if ($oParam->lFiltrarValor) {
+        $sWhere .= " and e60_vlremp <= 80000"; 
+      }
+
       if (!empty($oParam->iAnalise)) {
         $sWhere .= " and plugins.empenhonotacontroleinterno.sequencial = {$oParam->iAnalise}";
       }
