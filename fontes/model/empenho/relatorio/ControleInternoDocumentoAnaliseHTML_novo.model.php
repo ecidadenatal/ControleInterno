@@ -214,10 +214,10 @@ where analise.sequencial = $iInstrucaoTecnica ";
 
     $nTop = 212; 
     foreach ($oDadosLiquidacoes as $oItem) {
-	$this->html .= "<div style='position:absolute;top:$nTop;left:140'><span class='ft8'>{$oItem->processo_empenho}</span></div>";
-	$this->html .= "<div style='position:absolute;top:$nTop;left:430'><span class='ft8'>{$oItem->sequencial_nota}</span></div>";
-	$this->html .= "<div style='position:absolute;top:$nTop;left:653'><span class='ft8'> {$oItem->numero_empenho}/{$oItem->ano_empenho}</span></div>";
-        $nTop += 20;
+      $this->html .= "<div style='position:absolute;top:$nTop;left:140'><span class='ft8'>{$oItem->processo_empenho}</span></div>";
+      $this->html .= "<div style='position:absolute;top:$nTop;left:430'><span class='ft8'>{$oItem->sequencial_nota}</span></div>";
+      $this->html .= "<div style='position:absolute;top:$nTop;left:653'><span class='ft8'>{$oItem->numero_empenho}/{$oItem->ano_empenho}</span></div>";
+      $nTop += 20;
     }
 
     $nTop += 20;
@@ -247,15 +247,21 @@ where analise.sequencial = $iInstrucaoTecnica ";
     $this->html .= "<div style='position:absolute;top:0;left:378'><span class='ft0'>DESPACHO</span></div>";
     $this->html .= "<div style='position:absolute;top:18;left:80'><p class='ft5'>De acordo com a informação acima, encaminhamos o processo ao órgão de origem para providências.</p></div>";
     $this->html .= "<div style='position:absolute;top:70;left:325'><span class='ft8'>{$sCidade}, {$oDataAnalise->dataPorExtenso()}</span></div>";
-    $this->html .= "<div style='position:absolute;top:140;left:43'><span class='ft8'>__________________________________________</span></div>";
-    $this->html .= "<div style='position:absolute;top:160;left:43'><span class='ft8'>{$oDados->nome_chefe_atual}</span></div>";
-    $this->html .= "<div style='position:absolute;top:176;left:100'><span class='ft8'>{$oDados->cargo_chefe_atual}</span></div>";
-    $this->html .= "<div style='position:absolute;top:140;left:492'><span class='ft8'> __________________________________________</span></div>";
-    $this->html .= "<div style='position:absolute;top:160;left:557'><span class='ft8'>{$oDados->nome_analista}</span></div>";
-    $this->html .= "<div style='position:absolute;top:176;left:639'><span class='ft8'>{$oDados->cargo_analista}</span></div>";
-    $this->html .= "<div style='position:absolute;top:220;left:492'><span class='ft8'>__________________________________________</span></div>";
-    $this->html .= "<div style='position:absolute;top:240;left:557'><span class='ft8'>{$oDados->nome_diretor_atual}</span></div>";
-    $this->html .= "<div style='position:absolute;top:266;left:569'><span class='ft8'>{$oDados->cargo_diretor_atual}</span></div>";
+    if ($oDados->nome_analista != "") {
+      //$this->html .= "<div style='position:absolute;top:140;left:492'><span class='ft8'> __________________________________________</span></div>";
+      $this->html .= "<div style='position:absolute;top:140;left:43'><span class='ft8'>Analista: {$oDados->nome_analista}</span></div>";
+      //$this->html .= "<div style='position:absolute;top:176;left:639'><span class='ft8'>{$oDados->cargo_analista}</span></div>";
+    }
+    if ($oDados->nome_chefe_atual != "") {
+      //$this->html .= "<div style='position:absolute;top:140;left:43'><span class='ft8'>__________________________________________</span></div>";
+      $this->html .= "<div style='position:absolute;top:160;left:43'><span class='ft8'>Chefe: {$oDados->nome_chefe_atual}</span></div>";
+      //$this->html .= "<div style='position:absolute;top:176;left:100'><span class='ft8'>{$oDados->cargo_chefe_atual}</span></div>";
+    }
+    if ($oDados->nome_diretor_atual != "") {
+      $this->html .= "<div style='position:absolute;top:220;left:492'><span class='ft8'>__________________________________________</span></div>";
+      $this->html .= "<div style='position:absolute;top:240;left:557'><span class='ft8'>{$oDados->nome_diretor_atual}</span></div>";
+      $this->html .= "<div style='position:absolute;top:266;left:569'><span class='ft8'>{$oDados->cargo_diretor_atual}</span></div>";
+    }
     $this->html .= "</div>";
     $this->html .= "<script language='javascript'>";
     $this->html .= "window.onload = function initJS(){";

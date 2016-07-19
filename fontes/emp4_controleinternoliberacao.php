@@ -257,7 +257,7 @@ if (!empty($oGet->filtrovalor)) {
               var iHeight = (screen.availHeight - 40);
               var iWidth  = (screen.availWidth - 5);
               var sOpcoes = 'width=' + iWidth + ',height=' + iHeight + ',scrollbars=1,location=0';
-              var sQuery  = '?iCodigoNota=' + oRetorno.iCodigoAnalise;
+              var sQuery  = '?iNumeroInstrucao=' + oRetorno.iCodigoAnalise;
               var oJanela = window.open("emp4_documentocontroleinterno_002_natal.php" + sQuery, '', sOpcoes);
               
               oJanela.moveTo(0, 0);

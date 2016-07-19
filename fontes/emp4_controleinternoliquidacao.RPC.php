@@ -68,7 +68,7 @@ try {
 
     case 'liberarNotaEmpenhoAnalise':
 
-      $sRessalva = $oParam->sRessalva;
+      $sRessalva = db_stdClass::normalizeStringJsonEscapeString($oParam->sRessalva);
       $iSituacao = $oParam->iSituacao;
       $iNumCgm   = $oParam->iNumCgm;
       $aNotas    = $oParam->aNotas;
