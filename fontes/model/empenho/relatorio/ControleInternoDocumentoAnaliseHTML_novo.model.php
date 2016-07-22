@@ -77,14 +77,14 @@ class ControleInternoDocumentoAnaliseHTML_novo {
     from
         plugins.controleinternocredor analise
         inner join cgm cgmanalista on analise.usuario_analise = cgmanalista.z01_numcgm
-        inner join plugins.usuariocontroladoria usuanalista on analise.usuario_analise = usuanalista.numcgm
+         left join plugins.usuariocontroladoria usuanalista on analise.usuario_analise = usuanalista.numcgm
         inner join cgm cgmdiretor on analise.usuario_diretor_atual = cgmdiretor.z01_numcgm
-        inner join plugins.usuariocontroladoria usudiretor on analise.usuario_diretor_atual = usudiretor.numcgm
-        left join cgm cgmchefe on analise.usuario_chefe_atual = cgmchefe.z01_numcgm
-        left join plugins.usuariocontroladoria usuchefe on analise.usuario_chefe_atual = usuchefe.numcgm
-        left join cgm cgmaprovacao on analise.usuario_aprovacao = cgmaprovacao.z01_numcgm
+         left join plugins.usuariocontroladoria usudiretor on analise.usuario_diretor_atual = usudiretor.numcgm
+         left join cgm cgmchefe on analise.usuario_chefe_atual = cgmchefe.z01_numcgm
+         left join plugins.usuariocontroladoria usuchefe on analise.usuario_chefe_atual = usuchefe.numcgm
+         left join cgm cgmaprovacao on analise.usuario_aprovacao = cgmaprovacao.z01_numcgm
         inner join plugins.controleinternosituacoes sitanalista on analise.situacao_analise = sitanalista.sequencial
-        left join plugins.controleinternosituacoes sitdiretor on analise.situacao_aprovacao = sitdiretor.sequencial
+         left join plugins.controleinternosituacoes sitdiretor on analise.situacao_aprovacao = sitdiretor.sequencial
         inner join (
                         select
                                 distinct controleinternocredor, o40_orgao, o40_descr, o41_unidade, o41_descr

@@ -240,6 +240,7 @@ if (!empty($oGet->filtrovalor)) {
       'exec'      : 'liberarNotaEmpenhoAnalise',
       'aNotas'    : aNotas,
       'sRessalva' : encodeURIComponent(tagString(sRessalva)),
+      //'sRessalva' : sRessalva,
       'iSituacao' : iSituacao,
       'iNumCgm'   : iNumCgm
     };

@@ -280,8 +280,12 @@ if (!empty($oGet->filtrovalor)) {
 
   function js_salvar() {
     
-
     var aAnalisesSelecionadas = oGridAnalises.getSelection();
+
+    if (aAnalisesSelecionadas.length == 0) {
+      alert("Ao menos uma análise deve ser selecionada.");
+      return false;
+    }
 
     var aCodigoAnalises = Array();
     for (i = 0; i < aAnalisesSelecionadas.length; i++) {
@@ -425,7 +429,7 @@ if (!empty($oGet->filtrovalor)) {
       var sQueryStringAdicional = sQueryStringAdicional + '&iUnidade=' + iUnidade;
     }
 
-    var sQueryString           = sQueryStringAdicional + '<?php echo $sFiltroValor; ?>&funcao_js=parent.retornoanalise|0|3|2|6';
+    var sQueryString           = sQueryStringAdicional + '<?php echo $sFiltroValor; ?>&funcao_js=parent.retornoAnalise|0|3|2|6';
     var sArquivo              = 'func_controleinternocredor.php';
     var sTituloTela           = 'Pesquisar Análise';
     if (!lMostrar) {

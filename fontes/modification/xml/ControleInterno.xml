@@ -291,11 +291,13 @@
         <![CDATA[
   $sSqlNotasLiq .= "(case situacao";       
   $sSqlNotasLiq .= "    when 1 then 'Aguardando Análise'";       
-  $sSqlNotasLiq .= "    when 2 then 'Rejeitado Analista'";
-  $sSqlNotasLiq .= "    when 3 then 'Liberado Analista'";
-  $sSqlNotasLiq .= "    when 4 then 'Rejeitado Diretor'";
-  $sSqlNotasLiq .= "    when 5 then 'Liberado Diretor'";
-  $sSqlNotasLiq .= "    when 6 then 'Análise Automática'";       
+  $sSqlNotasLiq .= "    when 2 then 'Diligência'";
+  $sSqlNotasLiq .= "    when 3 then 'Regular'";
+  $sSqlNotasLiq .= "    when 4 then 'Rejeitado'";
+  $sSqlNotasLiq .= "    when 5 then 'Liberado'";
+  $sSqlNotasLiq .= "    when 6 then 'Análise Automática'";
+  $sSqlNotasLiq .= "    when 7 then 'Ressalva'";      
+  $sSqlNotasLiq .= "    when 8 then 'Irregular'";             
   $sSqlNotasLiq .= "    else 'Sem análise' end)  as dl_Situação,   ";]]>
       </add>
     </operation>
