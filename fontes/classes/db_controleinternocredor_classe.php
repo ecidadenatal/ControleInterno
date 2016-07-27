@@ -69,13 +69,16 @@ class cl_controleinternocredor extends DAOBasica {
 		if ($oDaoControleInterno->numrows == 0) {
 		  throw new Exception("A análise de nota {$oCredorControleInterno->empenhonotacontroleinterno} não pôde ser encontrada.");
 		}
-		$oControleInterno = db_utils::fieldsMemory($rsBuscaControleInterno, 0);
-		$oDaoControleInterno->nota     = $oControleInterno->nota;
-		$oDaoControleInterno->situacao = $situacao_aprovacao;
-		$oDaoControleInterno->alterar($oControleInterno->sequencial);
-		if ($oDaoControleInterno->erro_status == "0") {
-		  throw new Exception("Erro ao alterar a análise de nota {$oCredorControleInterno->empenhonotacontroleinterno}.");
-		}
+    if ($oControleInternoCredor->situacao_analise == ControleInterno::SITUACAO_REGULAR || $oControleInternoCredor->situacao_analise == ControleInterno::SITUACAO_RESSALVA) {
+  		$oControleInterno = db_utils::fieldsMemory($rsBuscaControleInterno, 0);
+  		$oDaoControleInterno->nota     = $oControleInterno->nota;
+  		$oDaoControleInterno->situacao = $situacao_aprovacao;
+  		$oDaoControleInterno->alterar($oControleInterno->sequencial);
+  		
+      if ($oDaoControleInterno->erro_status == "0") {
+  		  throw new Exception("Erro ao alterar a análise de nota {$oCredorControleInterno->empenhonotacontroleinterno}.");
+  		}
+    }
 	}
 
  }
