@@ -9,6 +9,7 @@
 
       <!-- lookup -->
       <file name="func_controleinternoliquidacoes.php"    path="/func_controleinternoliquidacoes.php" />
+      <file name="func_controleinternocredor.php"    path="/func_controleinternocredor.php" />
 
       <!-- classe -->
       <file name="db_empenhonotacontroleinterno_classe.php"    path="/classes/db_empenhonotacontroleinterno_classe.php" />
@@ -32,6 +33,7 @@
       <file name="ControleInternoMovimento.model.php"    path="/model/empenho/ControleInternoMovimento.model.php" />
       <file name="ControleInternoDocumentoAnalise.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnalise.model.php" />
       <file name="ControleInternoDocumentoAnaliseHTML.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnaliseHTML.model.php" />
+      <file name="ControleInternoDocumentoAnaliseHTML_novo.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnaliseHTML_novo.model.php" />
 
       <!-- outro -->
       <file name="ControleInterno.xml"    path="/modification/xml/ControleInterno.xml" />
@@ -39,6 +41,8 @@
       <file name="emp4_controleinternoaprovacao.php"    path="/emp4_controleinternoaprovacao.php" />
       <file name="emp4_documentocontroleinterno002.php"    path="/emp4_documentocontroleinterno002.php" />
       <file name="emp4_documentocontroleinterno001.php"    path="/emp4_documentocontroleinterno001.php" />
+      <file name="emp4_documentocontroleinterno_002_natal.php"    path="/emp4_documentocontroleinterno_002_natal.php" />
+      <file name="emp4_documentocontroleinterno_001_natal.php"    path="/emp4_documentocontroleinterno_001_natal.php" />
 
     </files>
 
@@ -48,16 +52,6 @@
       <estrutura file="/versao_1_4.sql" version="1.4"/>
       <estrutura file="/versao_1_6.sql" version="1.6"/>
     </estrutura>
-
-    <menus>
-      <menu type="4">
-        <item name="Controle Interno" file="" liberado-cliente="true" >
-          <item name="Análise" file="emp4_controleinternoliberacao.php" liberado-cliente="true" />
-          <item name="Aprovação" file="emp4_controleinternoaprovacao.php" liberado-cliente="true" />
-          <item name="Emissão da Nota de Análise" file="emp4_documentocontroleinterno001.php" liberado-cliente="true" />
-        </item>
-      </menu>
-    </menus>
 
     <dependencies>
       <plugin name="FiltrosDespesa" version="1.1" />

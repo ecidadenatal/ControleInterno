@@ -331,11 +331,19 @@ try {
         
         $aAnalises = array();
         for ($i = 0; $i < $oDaoAnalises->numrows; $i++) { 
-          $oAnalise = db_utils::fieldsMemory($rsAnalises, $i);
+          $oDaoAnalise = db_utils::fieldsMemory($rsAnalises, $i);
+
+          $oAnalise = new stdClass();
+          $oAnalise->codigoanalise = $oDaoAnalise->codigoanalise;
+          $oAnalise->exercicio     = $oDaoAnalise->exercicio;
+          $oAnalise->dataanalise   = $oDaoAnalise->dataanalise;
+          $oAnalise->orgao         = $oDaoAnalise->orgao;
+          $oAnalise->unidade       = $oDaoAnalise->unidade;
+          $oAnalise->situacao      = utf8_encode($oDaoAnalise->situacao);
+          
           $aAnalises[]  = $oAnalise;
         }
         $oRetorno->aAnalises = $aAnalises;
-
       }
 
     break;

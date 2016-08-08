@@ -47,7 +47,7 @@ if (!empty($oGet->filtrovalor)) {
 <html xmlns="http://www.w3.org/1999/html">
 <head>
   <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta charset='iso-8859-1' http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <?php
   // Includes padrão
   db_app::load("scripts.js, prototype.js, strings.js, datagrid.widget.js, AjaxRequest.js");
@@ -137,7 +137,7 @@ if (!empty($oGet->filtrovalor)) {
           </td>
         </tr>
         <tr>
-          <td class="headerLabel"><label for="situacao">Liberação:</label></td>
+          <td class="headerLabel"><label for="situacao">Situação:</label></td>
           <td colspan="3">
             <?php
               $oSituacoesControleInterno = db_utils::getDao("controleinternosituacoes");
@@ -381,6 +381,7 @@ if (!empty($oGet->filtrovalor)) {
 
       for (i = 0; i < oRetorno.aAnalises.length; i++) {
         //Monta a linha e coloca no array.
+
         var aLinha = [oRetorno.aAnalises[i].exercicio, 
                       oRetorno.aAnalises[i].codigoanalise, 
                       js_formatar(oRetorno.aAnalises[i].dataanalise, 'd'), 

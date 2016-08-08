@@ -228,7 +228,10 @@ where analise.sequencial = $iInstrucaoTecnica ";
     $nTop += 40;
     $this->html .= "<div style='position:absolute;top:$nTop;left:274'><span class='ft0'>INSTRUÇÃO TÉCNICA Nº {$oDados->sequencial_analise}/{$oDataAnalise->getAno()}-DCI/CGM</span></div>";
     $nTop += 16;
+    $this->html .= "<div>";
     $this->html .= "<div id='ressalva' style='position:absolute;top:$nTop;left:43'><p class='ft5'>{$oDados->parecer}</p></div>";
+    $nTop += 16;
+
   }
 
   /**
@@ -242,31 +245,41 @@ where analise.sequencial = $iInstrucaoTecnica ";
     $oInstituicao = InstituicaoRepository::getInstituicaoPrefeitura();
     $sCidade      = mb_convert_case($oInstituicao->getMunicipio(), MB_CASE_TITLE);
     
-    $this->html .= "<div id='rodape' style='position:relative;top:450;'>";
-    $this->html .= "<div style='position:absolute;top:0;left:378'><span class='ft0'>DESPACHO</span></div>";
-    $this->html .= "<div style='position:absolute;top:18;left:80'><p class='ft5'>De acordo com a informação acima, encaminhamos o processo ao órgão de origem para providências.</p></div>";
-    $this->html .= "<div style='position:absolute;top:70;left:325'><span class='ft8'>{$sCidade}, {$oDataAnalise->dataPorExtenso()}</span></div>";
-    if ($oDados->nome_analista != "") {
-      //$this->html .= "<div style='position:absolute;top:140;left:492'><span class='ft8'> __________________________________________</span></div>";
-      $this->html .= "<div style='position:absolute;top:140;left:43'><span class='ft8'>Analista: {$oDados->nome_analista}</span></div>";
-      //$this->html .= "<div style='position:absolute;top:176;left:639'><span class='ft8'>{$oDados->cargo_analista}</span></div>";
-    }
+    $this->html .= "<div id='fim' style='position:absolute;bottom:0px;'>";
     if ($oDados->nome_chefe_atual != "") {
-      //$this->html .= "<div style='position:absolute;top:140;left:43'><span class='ft8'>__________________________________________</span></div>";
-      $this->html .= "<div style='position:absolute;top:160;left:43'><span class='ft8'>Chefe: {$oDados->nome_chefe_atual}</span></div>";
-      //$this->html .= "<div style='position:absolute;top:176;left:100'><span class='ft8'>{$oDados->cargo_chefe_atual}</span></div>";
+      $this->html .= "<div id='chefe'>";
+      $this->html .= "<div style='position:absolute;top:0;left:42'><span class='ft8'>__________________________________________</span></div>";
+      $this->html .= "<div style='position:absolute;top:20;left:70'><span class='ft8'>{$oDados->nome_chefe_atual}</span></div>";
+      $this->html .= "<div id='cargo_chefe' style='position:absolute;top:40;left:100'><span class='ft8'>{$oDados->cargo_chefe_atual}</span></div>";
+      $this->html .= "</div>";
     }
+    if ($oDados->nome_analista != "") {
+      $this->html .= "<div id='analise'>";
+      $this->html .= "<div style='position:absolute;top:0;left:492'><span class='ft8'> __________________________________________</span></div>";
+      $this->html .= "<div style='position:absolute;top:20;left:520'><span class='ft8'>{$oDados->nome_analista}</span></div>";
+      $this->html .= "<div id='cargo_analista' style='position:absolute;top:40;left:639'><span class='ft8'>{$oDados->cargo_analista}</span></div>";
+      $this->html .= "</div>";
+    }
+
+    $this->html .= "<div id='rodape' style='position:relative;'>";
+    $this->html .= "<div style='position:relative;top:80;left:378'><span class='ft0'>DESPACHO</span></div>";
+    $this->html .= "<div style='position:relative;top:98;left:80'><p class='ft5'>De acordo com a informação acima, encaminhamos o processo ao órgão de origem para providências.</p></div>";
+    $this->html .= "<div style='position:relative;top:110;left:325'><span class='ft8'>{$sCidade}, {$oDataAnalise->dataPorExtenso()}</span></div>";    
     if ($oDados->nome_diretor_atual != "") {
-      $this->html .= "<div style='position:absolute;top:220;left:492'><span class='ft8'>__________________________________________</span></div>";
-      $this->html .= "<div style='position:absolute;top:240;left:557'><span class='ft8'>{$oDados->nome_diretor_atual}</span></div>";
-      $this->html .= "<div style='position:absolute;top:266;left:569'><span class='ft8'>{$oDados->cargo_diretor_atual}</span></div>";
+      $this->html .= "<div style='position:relative;top:230;left:492'><span class='ft8'>__________________________________________</span></div>";
+      $this->html .= "<div style='position:relative;top:250;left:557'><span class='ft8'>{$oDados->nome_diretor_atual}</span></div>";
+      $this->html .= "<div style='position:relative;top:276;left:569'><span class='ft8'>{$oDados->cargo_diretor_atual}</span></div>";
     }
+    $this->html .= "</div>";
+    //div fim
+    $this->html .= "</div>";
+    //div que começa antes da ressalva
     $this->html .= "</div>";
     $this->html .= "<script language='javascript'>";
     $this->html .= "window.onload = function initJS(){";
     $this->html .= "  var fimRessalva = document.getElementById('ressalva');";
     $this->html .= "  var fimRodape = fimRessalva.offsetTop + fimRessalva.offsetHeight + 30;";
-    $this->html .= "  document.getElementById('rodape').style.top = fimRodape+'px';";
+    $this->html .= "  document.getElementById('fim').style.top = fimRodape+'px';";
     $this->html .= "  window.print();";
     $this->html .= "}";
     $this->html .= "</script>";

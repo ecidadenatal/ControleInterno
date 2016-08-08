@@ -101,7 +101,7 @@ if (!empty($oGet->filtrovalor)) {
           </td>
         </tr>
         <tr>
-          <td class="headerLabel"><label for="situacao">Liberada:</label></td>
+          <td class="headerLabel"><label for="situacao">Situação:</label></td>
           <td colspan="3">
             <?php
               $oSituacoesControleInterno = db_utils::getDao("controleinternosituacoes");

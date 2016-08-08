@@ -72,6 +72,9 @@ class cl_empenhonotacontroleinterno extends DAOBasica {
    */
   function sql_query_documento_analise($sCampos = '*', $sOrder = '', $sWhere = '') {
 
+    $aDotacoesUsuario = PermissaoUsuarioEmpenho::getDotacoesUsuario(db_getsession('DB_id_usuario'), db_getsession('DB_anousu'), "M");
+    $sDotacoesUsuario = implode(", ", $aDotacoesUsuario);
+
     $sSql  = " select {$sCampos} ";
     $sSql .= " from plugins.empenhonotacontroleinterno ";
     $sSql .= "    left join plugins.empenhonotacontroleinternohistorico on empenhonotacontroleinterno.sequencial = plugins.empenhonotacontroleinternohistorico.empenhonotacontroleinterno ";
@@ -81,7 +84,7 @@ class cl_empenhonotacontroleinterno extends DAOBasica {
     $sSql .= "   inner join empempaut            on e60_numemp = e61_numemp  ";
     $sSql .= "   inner join empautoriza          on e54_autori = e61_autori  ";
     $sSql .= "    left join empautorizaprocesso  on e150_empautoriza = e54_autori  ";
-    $sSql .= "   inner join orcdotacao           on e60_anousu = o58_anousu and e60_coddot = o58_coddot ";
+    $sSql .= "   inner join orcdotacao           on e60_anousu = o58_anousu and e60_coddot = o58_coddot and o58_coddot in (".$sDotacoesUsuario.")";
     $sSql .= "   inner join orcorgao             on o58_anousu = o40_anousu and o58_orgao = o40_orgao ";
     $sSql .= "   inner join orcunidade           on o58_anousu = o41_anousu and o58_orgao = o41_orgao and o58_unidade = o41_unidade ";
     $sSql .= "   inner join cgm                  on e60_numcgm = z01_numcgm ";
