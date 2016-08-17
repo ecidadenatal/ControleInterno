@@ -60,9 +60,12 @@ try {
         if ($oDaoControleInternoCredor->erro_status == "0") {
           throw new Exception("Erro ao alterar a análise {$iCodigoAnalise}.");
         }
-
-        $oRetorno->message = urlencode("A aprovação das análises foi salva.");
       }      
+      if ($iSituacao == ControleInterno::SITUACAO_APROVADA) {
+        $oRetorno->message = urlencode("Análises aprovadas.");
+      } else {
+        $oRetorno->message = urlencode("Análises rejeitadas.");
+      }
 
     break;
 
@@ -74,6 +77,7 @@ try {
       $aNotas    = $oParam->aNotas;
       $oUsuario  = new UsuarioSistema(db_getsession('DB_id_usuario'));
       $oUsuarioControladoria = db_utils::fieldsMemory(db_query("select * from plugins.usuariocontroladoria where numcgm = (select cgmlogin from db_usuacgm where id_usuario = {$oUsuario->getCodigo()})"), 0);
+      $oDaoEmpenhoControleInterno =  new cl_empenhonotacontroleinterno();
 
       $oControleInternoCredor = db_utils::getDao("controleinternocredor");
       $oControleInternoCredor->sequencial            = null;
@@ -91,10 +95,26 @@ try {
 
       for ($i = 0; $i < count($aNotas); $i++) { 
           
+        $sWhere = "e69_codnota = {$aNotas[$i]} and ((not exists (select 1 from plugins.empenhonotacontroleinterno where nota = e69_codnota and situacao != ".ControleInterno::SITUACAO_REJEITADA.")
+                      or (select situacao_aprovacao from plugins.controleinternocredor
+                                              inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
+                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial order by controleinternocredor.sequencial desc limit 1) = ". ControleInterno::SITUACAO_REJEITADA ."
+                      or (select situacao_aprovacao from plugins.controleinternocredor
+                                              inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
+                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial
+                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.") order by controleinternocredor.sequencial desc limit 1) = ". ControleInterno::SITUACAO_APROVADA ."))";
+        $rsControleInterno = $oDaoEmpenhoControleInterno->sql_record($oDaoEmpenhoControleInterno->sql_query_empenhos_para_controle_interno("*", "", $sWhere));
+
+        if($oDaoEmpenhoControleInterno->numrows == 0) {
+          throw new BusinessException("A nota {$aNotas[$i]} já se encontra numa análise pendente de aprovação.");
+        }
+          
         $sMensagemLiberacao = "";
         $oNotaLiquidacao = new NotaLiquidacao($aNotas[$i]);
 
-        /* [SolicitacaoRepasse] - Extensao */
+        if (SolicitacaoRepasseFinanceiro::notaTemSolicitacao($aNotas[$i])) {
+          throw new BusinessException("Não é possível alterar a liberação. A Nota de Liquidação já possui uma Solicitação de Repasse Financeiro.");
+        }
 
         $oDaoEmpNota = new cl_empnota();
 
@@ -183,12 +203,16 @@ try {
 
       break;
 
+    //RETIRAR ESTE CASE QUANDO NÃO FOR MAIS NECESSÁRIO APROVAR ANÁLISES ANTIGAS
     case 'liberarNotaEmpenho':
 
       $sMensagemLiberacao = "";
       $oNotaLiquidacao = new NotaLiquidacao($oParam->iCodigoNota);
 
-      /* [SolicitacaoRepasse] - Extensao */
+      if (SolicitacaoRepasseFinanceiro::notaTemSolicitacao($oParam->iCodigoNota)) {
+        throw new BusinessException("Não é possível alterar a liberação. A Nota de Liquidação já possui uma Solicitação de Repasse Financeiro.");
+      }
+        
 
       $oDaoEmpNota = new cl_empnota();
 
@@ -213,6 +237,7 @@ try {
         if ( ControleInterno::verificaAnaliseAutomatica($oEmpNota->o56_elemento)) {
 
           $lUltimaLiquidacao = ($oEmpNota->e60_vlremp - $oEmpNota->e60_vlrliq - $oEmpNota->e60_vlranu) == 0;
+
           /**
            * Caso não seja a primeira nota de iquidação verifica se a primeira esta liberada
            */
@@ -220,14 +245,14 @@ try {
 
             $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
 
-            if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() < ControleInterno::SITUACAO_LIBERADO_DIRETOR) {
+            if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() < ControleInterno::SITUACAO_APROVADA) {
 
               $sMensagem  = "Esta nota se enquadra na regra de análise automática. É necessário fazer a liberação ";
               $sMensagem .= "da primeira nota deste empenho para a liberação das demais.";
               throw new Exception($sMensagem);
             }
 
-          } else if ($oParam->iSituacao == ControleInterno::SITUACAO_LIBERADO_DIRETOR) {
+          } else if ($oParam->iSituacao == ControleInterno::SITUACAO_APROVADA) {
 
             /**
              * Caso seja uma liberação do diretor, já autoriza as liquidações pendentes, exceto a última
@@ -269,7 +294,7 @@ try {
         $sMensagem = "Liberação efetuada com sucesso.\nA nota está disponível para pagamento.";
       }
 
-      if (in_array($oParam->iSituacao, array(ControleInterno::SITUACAO_REJEITADO_ANALISTA, ControleInterno::SITUACAO_REJEITADO_DIRETOR))) {
+      if (in_array($oParam->iSituacao, array(ControleInterno::SITUACAO_DILIGENCIA, ControleInterno::SITUACAO_IRREGULAR, ControleInterno::SITUACAO_REJEITADA))) {
         $sMensagem = "A nota informada não foi liberada para pagamento.\nInforme o responsável pela nota para as devidas providências.";
       }
 
@@ -291,7 +316,7 @@ try {
 
     case 'getAnalises':
 
-       $sCampos = "distinct(plugins.controleinternocredor.sequencial) as codigoAnalise, 
+      $sCampos = "distinct(plugins.controleinternocredor.sequencial) as codigoAnalise, 
                   extract(year from plugins.controleinternocredor.data_analise) as exercicio, 
                   plugins.controleinternocredor.data_analise as dataAnalise, 
                   o58_orgao as orgao, 
@@ -311,8 +336,9 @@ try {
         $sWhere .= " and e60_vlremp <= 80000"; 
       }
 
+      //Campo referente a analise do credor
       if (!empty($oParam->iAnalise)) {
-        $sWhere .= " and plugins.empenhonotacontroleinterno.sequencial = {$oParam->iAnalise}";
+        $sWhere .= " and plugins.controleinternocredor.sequencial = {$oParam->iAnalise}";
       }
 
       if (!empty($oParam->iExercicio)) {
@@ -346,7 +372,223 @@ try {
         $oRetorno->aAnalises = $aAnalises;
       }
 
-    break;
+      break;
+
+    case 'buscarDetalhesAnalise':
+      
+      $oDaoControleInternoCredor = db_utils::getDao("controleinternocredor");
+      $rsLiquidacoes = $oDaoControleInternoCredor->sql_record($oDaoControleInternoCredor->getDadosAnalise($oParam->iAnalise));
+      $aLiquidacoes = array();
+
+      if($oDaoControleInternoCredor->numrows == 0) {
+        $oRetorno->status  = 0;
+        throw new BusinessException("Não foram encontrados dados referentes à análise {$oParam->iAnalise}.");
+      }
+
+      for ($i=0; $i < $oDaoControleInternoCredor->numrows; $i++) { 
+        $oDaoLiquidacoes = db_utils::fieldsMemory($rsLiquidacoes, $i);
+        $oLiquidacao = new stdClass();
+
+        $oLiquidacao->iCodigoEmpenho = $oDaoLiquidacoes->e60_numemp;
+        $oLiquidacao->iCodigoNota    = $oDaoLiquidacoes->e69_codnota;
+        $oLiquidacao->sNomeCredor    = $oDaoLiquidacoes->z01_nome;
+        $oLiquidacao->nValor         = $oDaoLiquidacoes->e70_vlrliq;
+
+        $aLiquidacoes[] = $oLiquidacao;
+        $oRetorno->sParecer = $oDaoLiquidacoes->parecer;
+      }
+
+      $oRetorno->aLiquidacoes = $aLiquidacoes;
+
+      break;
+
+    case 'alterarNotaEmpenhoAnalise':
+
+      $oDaoControleInternoCredor  = db_utils::getDao("controleinternocredor");
+      $oDaoControleCredorEmpNota  = db_utils::getDao("controleinternocredor_empenhonotacontroleinterno");
+      $oDaoEmpenhoControleInterno = db_utils::getDao("empenhonotacontroleinterno");
+      $oDaoEmpenhoControleInternoHistorico = db_utils::getDao("empenhonotacontroleinternohistorico");
+      $oUsuario  = new UsuarioSistema(db_getsession('DB_id_usuario'));
+
+      $rsControleInternoCredor = $oDaoControleInternoCredor->sql_record($oDaoControleInternoCredor->sql_query_file($oParam->iAnalise, "*", "", ""));
+      $aLiquidacoesAnterior = db_utils::getCollectionByRecord($oDaoEmpenhoControleInterno->sql_record($oDaoEmpenhoControleInterno->sql_query_documento_analise("distinct nota", "", "plugins.controleinternocredor.sequencial = {$oParam->iAnalise}")));
+      $aLiquidacoesAtual    = $oParam->aNotas;
+
+      if ($oDaoControleInternoCredor->numrows == 1) {
+        //Atualiza os dados da análise
+        $oControleInternoCredor = db_utils::fieldsMemory($rsControleInternoCredor, 0);
+
+        $oDaoControleInternoCredor->numcgm_credor         = $oControleInternoCredor->numcgm_credor;
+        $oDaoControleInternoCredor->parecer               = db_stdClass::normalizeStringJsonEscapeString($oParam->sRessalva);
+        $oDaoControleInternoCredor->usuario_analise       = $oControleInternoCredor->usuario_analise;
+        $oDaoControleInternoCredor->data_analise          = date('d/m/Y', db_getsession('DB_datausu'));
+        $oDaoControleInternoCredor->situacao_analise      = $oParam->iSituacao;
+        $oDaoControleInternoCredor->usuario_diretor_atual = $oControleInternoCredor->usuario_diretor_atual;
+        $oDaoControleInternoCredor->usuario_chefe_atual   = $oControleInternoCredor->usuario_chefe_atual;
+        $oDaoControleInternoCredor->usuario_aprovacao     = null;
+        $oDaoControleInternoCredor->data_aprovacao        = null;
+        $oDaoControleInternoCredor->situacao_aprovacao    = null;
+        $oDaoControleInternoCredor->alterar($oControleInternoCredor->sequencial);
+        //Verifica se foram incluídas liquidações novas
+        for ($i = 0; $i < count($aLiquidacoesAtual); $i++) { 
+          //Se o código da liquidação do array das liquidações atuais não estiver no das liquidações que estão no banco, é porque a liquidação é nova
+          //Faz o mesmo processo que quando salva a análise
+          $notaNova = true;
+          foreach ($aLiquidacoesAnterior as $oLiquidacao) {
+            if ($aLiquidacoesAtual[$i] == $oLiquidacao->nota) {
+              $notaNova = false;
+            }
+          }
+          if($notaNova) {
+            $sWhere = "e69_codnota = {$aLiquidacoesAtual[$i]} and ((not exists (select 1 from plugins.empenhonotacontroleinterno where nota = e69_codnota and situacao != ".ControleInterno::SITUACAO_REJEITADA.")
+                      or (select situacao_aprovacao from plugins.controleinternocredor
+                                              inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
+                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial order by controleinternocredor.sequencial desc limit 1) = ". ControleInterno::SITUACAO_REJEITADA ."
+                      or (select situacao_aprovacao from plugins.controleinternocredor
+                                              inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
+                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial
+                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.") order by controleinternocredor.sequencial desc limit 1) = ". ControleInterno::SITUACAO_APROVADA ."))";
+            $rsControleInterno = $oDaoEmpenhoControleInterno->sql_record($oDaoEmpenhoControleInterno->sql_query_empenhos_para_controle_interno("*", "", $sWhere));
+
+            if($oDaoEmpenhoControleInterno->numrows == 0) {
+              throw new BusinessException("A nota {$aLiquidacoesAtual[$i]} já se encontra numa análise pendente de aprovação.");
+            }
+              
+            $sMensagemLiberacao = "";
+            $oNotaLiquidacao = new NotaLiquidacao($aLiquidacoesAtual[$i]);
+
+            if (SolicitacaoRepasseFinanceiro::notaTemSolicitacao($aLiquidacoesAtual[$i])) {
+              throw new BusinessException("Não é possível alterar a liberação. A Nota de Liquidação já possui uma Solicitação de Repasse Financeiro.");
+            }
+
+            $oDaoEmpNota = new cl_empnota();
+
+            $aWhere = array(
+              "e69_numemp = {$oNotaLiquidacao->getNumeroEmpenho()}",
+              "e70_valor <> e70_vlranu",
+              "e70_valor = e70_vlrliq"
+            );
+            $sSqlEmpNota = $oDaoEmpNota->sql_query_valor_financeiro( null,
+                                                                     "e69_codnota, o56_elemento, e60_vlremp, e60_vlrliq, e60_vlranu",
+                                                                     "e69_codnota",
+                                                                     implode(' and ', $aWhere) );
+            $rsEmpNota = $oDaoEmpNota->sql_record($sSqlEmpNota);
+
+            if ($oDaoEmpNota->numrows > 0) {
+
+              $oEmpNota = db_utils::fieldsMemory($rsEmpNota, 0);
+
+              /**
+               * Verifica se o elemento do empenho se enquadra na análise automática
+               */
+              if ( ControleInterno::verificaAnaliseAutomatica($oEmpNota->o56_elemento)) {
+
+                $lUltimaLiquidacao = ($oEmpNota->e60_vlremp - $oEmpNota->e60_vlrliq - $oEmpNota->e60_vlranu) == 0;
+                /**
+                 * Caso não seja a primeira nota de iquidação verifica se a primeira esta liberada
+                 */
+                if ($oEmpNota->e69_codnota != $aLiquidacoesAtual[$i]) {
+
+                  $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
+
+                  if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() != ControleInterno::SITUACAO_APROVADA) {
+
+                    $sMensagem  = "A nota {$aLiquidacoesAtual[$i]} se enquadra na regra de análise automática. É necessário fazer a liberação ";
+                    $sMensagem .= "da primeira nota deste empenho para a liberação das demais.";
+                    throw new Exception($sMensagem);
+                  }
+
+                } else if ($oParam->iSituacao == ControleInterno::SITUACAO_APROVADA) {
+
+                  /**
+                   * Caso seja uma liberação do diretor, já autoriza as liquidações pendentes, exceto a última
+                   */
+                  for ($iRow = 1; $iRow < $oDaoEmpNota->numrows; $iRow++) {
+
+                    $oDadosNota = db_utils::fieldsMemory($rsEmpNota, $iRow);
+                    $oControleInterno = new ControleInternoMovimento(db_utils::fieldsMemory($rsEmpNota, $iRow)->e69_codnota);
+
+                    if ( $oControleInterno->getSituacaoFinal() == ControleInterno::SITUACAO_AGUARDANDO_ANALISE
+                      && !($lUltimaLiquidacao && $iRow == $oDaoEmpNota->numrows-1) ) {
+
+                      $oControleInterno->criaAutorizacaoAutomatica();
+                    }
+                  }
+
+                  $sMensagemLiberacao  = "O empenho se enquadra na regra de análise automática. As próximas análises serão ";
+                  $sMensagemLiberacao .= "feitas automaticamente após a liquidação do empenho. Caso existam notas pendentes para ";
+                  $sMensagemLiberacao .= "análise, as mesmas serão liberadas automaticamente.";
+                }
+              }
+            }
+
+            $oControleInterno = new ControleInternoMovimento($aLiquidacoesAtual[$i]);
+            $oControleInterno->setSituacao($oParam->iSituacao);
+            $oControleInterno->setRessalva(db_stdClass::normalizeStringJsonEscapeString($oParam->sRessalva));
+            $oControleInterno->setUsuario($oUsuario);
+            $oControleInterno->setData(new DBDate(date('d/m/Y', db_getsession('DB_datausu'))));
+            $oControleInterno->setHora(date('H:i'));
+            $oControleInterno->salvar();
+
+            $oControleCredorNota = db_utils::getDao("controleinternocredor_empenhonotacontroleinterno");
+            $oControleCredorNota->empenhonotacontroleinterno = $oControleInterno->getCodigo();
+            $oControleCredorNota->controleinternocredor      = $oControleInternoCredor->sequencial;
+            $oControleCredorNota->incluir(null);
+          }
+        }
+        //Verifica se foram excluídas liquidações
+        for ($i = 0; $i < count($aLiquidacoesAnterior); $i++) { 
+          //Se a liquidação do array das liquidações do banco não estiver no array das liquidações que vieram da tela, é porque ela foi excluída da análise
+          if (!in_array($aLiquidacoesAnterior[$i]->nota, $aLiquidacoesAtual)) {
+            $oDaoControleCredorEmpNota->excluir(null, "empenhonotacontroleinterno = (select sequencial from plugins.empenhonotacontroleinterno where nota = {$aLiquidacoesAnterior[$i]->nota})");
+            $oDaoEmpenhoControleInternoHistorico->excluir(null, "empenhonotacontroleinterno = (select sequencial from plugins.empenhonotacontroleinterno where nota = {$aLiquidacoesAnterior[$i]->nota})");
+            $oDaoEmpenhoControleInterno->excluir(null, "nota = {$aLiquidacoesAnterior[$i]->nota}");  
+          }
+        }
+
+      } else {
+        $oRetorno->erro = true;
+        $oRetorno->status = 0;
+        throw new BusinessException("Análise {$oParam->iAnalise} não encontrada.");
+      }
+      $oRetorno->message = urlencode("Alteração efetuada com sucesso.");
+
+      break;
+
+      case 'excluirNotaEmpenhoAnalise':
+
+        if (isset($oParam->iAnalise)) {
+
+          $oDaoControleInternoCredor  = db_utils::getDao("controleinternocredor");
+          $oDaoControleCredorEmpNota  = db_utils::getDao("controleinternocredor_empenhonotacontroleinterno");
+          $oDaoEmpenhoControleInterno = db_utils::getDao("empenhonotacontroleinterno");
+          $oDaoEmpenhoControleInternoHistorico = db_utils::getDao("empenhonotacontroleinternohistorico");
+          //Pega os sequenciais de todas as análises de nota (empenhonotacontroleinterno) vinculadas à análise (controleinternocredor)
+          $rsEmpNotaControleInterno = $oDaoEmpenhoControleInterno->sql_record($oDaoEmpenhoControleInterno->sql_query_file(null, 
+                                                                                                                   "sequencial", 
+                                                                                                                   "", 
+                                                                                                                   "sequencial in (select empenhonotacontroleinterno 
+                                                                                                                                   from plugins.controleinternocredor_empenhonotacontroleinterno
+                                                                                                                                   where controleinternocredor = {$oParam->iAnalise})")); 
+          for ($i = 0; $i < $oDaoEmpenhoControleInterno->numrows; $i++) { 
+            $oEmpNotaControleInterno = db_utils::fieldsMemory($rsEmpNotaControleInterno, $i);
+            //Apaga todos os históricos (empenhonotacontroleinternohistorico) vinculados a análise de nota (empenhonotacontroleinterno)
+            $oDaoEmpenhoControleInternoHistorico->excluir(null, "empenhonotacontroleinterno = {$oEmpNotaControleInterno->sequencial}");
+            //Apaga a análise de nota (empenhonotacontroleinterno)
+            $oDaoEmpenhoControleInterno->excluir(null, "sequencial = $oEmpNotaControleInterno->sequencial");  
+          }       
+          //Apaga todos os dados de vínculo entre a empenhonotacontroleinterno e a controleinternocredor
+          $oDaoControleCredorEmpNota->excluir(null, "controleinternocredor = {$oParam->iAnalise}");
+          //Apaga a análise de credor (controleinternocredor)
+          $oDaoControleInternoCredor->excluir(null, "sequencial = {$oParam->iAnalise}");
+          $oRetorno->message = urlencode("Exclusão efetuada com sucesso.");
+
+        } else {
+          $oRetorno->erro = true;
+          $oRetorno->message = urlencode("Informe uma análise.");
+          $oRetorno->status = 1;
+        }
+        break;
   }
   db_fim_transacao(false);
 } catch (Exception $eErro) {
@@ -356,3 +598,4 @@ try {
   $oRetorno->message = urlencode($eErro->getMessage());
 }
 echo $oJson->encode($oRetorno);
+

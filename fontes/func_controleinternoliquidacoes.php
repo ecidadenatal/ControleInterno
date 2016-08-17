@@ -112,11 +112,11 @@ $Se60_numemp = "Seq. Empenho";
         $aWhere[] = "((not exists (select 1 from plugins.empenhonotacontroleinterno where nota = e69_codnota and situacao != ".ControleInterno::SITUACAO_REJEITADA.")
                       or (select situacao_aprovacao from plugins.controleinternocredor
                                               inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
-                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial) = ". ControleInterno::SITUACAO_REJEITADA ."
+                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial limit 1) = ". ControleInterno::SITUACAO_REJEITADA ."
                       or (select situacao_aprovacao from plugins.controleinternocredor
                                               inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
                                                                                                                  and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial
-                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.")) = ". ControleInterno::SITUACAO_APROVADA ."))";
+                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.") limit 1) = ". ControleInterno::SITUACAO_APROVADA ."))";
       }
 
       if (!empty($chave_e60_codemp)) {

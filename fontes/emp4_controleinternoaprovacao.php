@@ -119,7 +119,8 @@ if (!empty($oGet->filtrovalor)) {
           <td>
             <?php
             db_input('analise_numero', 10, 1, true, 'text', $iOpcao, 'onChange="buscarAnalise(false)"');
-            db_input('analise_descricao', 44, 0, true, 'text', 3);
+//modificado
+            db_input('analise_descricao', 44, 0, true, 'hidden', 3);
             ?>
           </td>
         </tr>
@@ -470,6 +471,10 @@ if (!empty($oGet->filtrovalor)) {
     $(sCampo+'_numero').value = iCodigo;
     if (lErro) {
       $(sCampo+'_numero').value = '';
+      //modificado
+      if (sCampo == 'analise') {
+        alert('Análise informada não encontrada!');
+      }
     }
     $(sCampo+'_descricao').value = sDescricao;
   }

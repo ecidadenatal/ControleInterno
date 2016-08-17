@@ -39,6 +39,8 @@
       <file name="ControleInterno.xml"    path="/modification/xml/ControleInterno.xml" />
       <file name="emp4_controleinternoliberacao.php"    path="/emp4_controleinternoliberacao.php" />
       <file name="emp4_controleinternoaprovacao.php"    path="/emp4_controleinternoaprovacao.php" />
+      <file name="emp4_controleinternoalteracao.php"    path="/emp4_controleinternoalteracao.php" />
+      <file name="emp4_controleinternoexclusao.php"     path="/emp4_controleinternoexclusao.php" />
       <file name="emp4_documentocontroleinterno002.php"    path="/emp4_documentocontroleinterno002.php" />
       <file name="emp4_documentocontroleinterno001.php"    path="/emp4_documentocontroleinterno001.php" />
       <file name="emp4_documentocontroleinterno_002_natal.php"    path="/emp4_documentocontroleinterno_002_natal.php" />
@@ -55,6 +57,7 @@
 
     <dependencies>
       <plugin name="FiltrosDespesa" version="1.1" />
+      <plugin name="RepasseFinanceiro" version="1.4" />
     </dependencies>
 
   </plugin>

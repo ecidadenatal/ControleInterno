@@ -65,10 +65,26 @@ require_once("dbforms/db_funcoes.php");
       </tr>
       <tr>
         <td>
+          <b>CNPJ:</b>
+        </td>
+        <td>
+          <?php db_input("cnpj", 15, 0, true, "text", 4, "", "chave_cnpj"); ?>
+        </td>
+      </tr>
+      <tr>
+        <td>
           <b>Exercício:</b>
         </td>
         <td>
           <?php db_input("exercicio", 8, 0, true, "text", 4, "", "chave_exercicio"); ?>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <b>Intervalo:</b>
+        </td>
+        <td>
+          <?php db_inputdata("periodo_inicial", null, null,null,true,'text',1); ?> à <?php db_inputdata("periodo_final", null, null, null,true,'text',1); ?>
         </td>
       </tr>
     </table>
@@ -102,6 +118,10 @@ require_once("dbforms/db_funcoes.php");
         $aWhere[] = "(situacao_aprovacao is null and situacao_analise is not null )";
       }
 
+      if (!empty($filtro_alteracao)) {
+        $aWhere[] = "(situacao_aprovacao is null and situacao_analise is not null )";
+      }
+
       if (!empty($filtrarvalor)) {
         $aWhere[] = "e60_vlremp <= 80000";
       }
@@ -114,20 +134,35 @@ require_once("dbforms/db_funcoes.php");
         $aWhere[] = "o58_unidade = {$iUnidade}"; 
       }
 
-      if (!empty($cod_analise)) {
-        $aWhere[] = "plugins.controleinternocredor.sequencial = {$cod_analise}";
+      if (isset($pesquisa_chave) && $pesquisa_chave != "") {
+        $chave_analise = $pesquisa_chave;
+      }
+      if (!empty($chave_analise)) {
+        $aWhere[] = "plugins.controleinternocredor.sequencial = {$chave_analise}";
       }
 
-      if (!empty($orgao)) {
-        $aWhere[] = "o58_orgao = {$orgao}";
+      if (!empty($chave_cnpj)) {
+        $aWhere[] = "numcgm_credor in (select z01_numcgm from cgm where z01_cgccpf = '{$chave_cnpj}')";
       }
 
-      if (!empty($unidade)) {
-        $aWhere[] = "o58_unidade = {$unidade}";
+      if (!empty($chave_orgao)) {
+        $aWhere[] = "o58_orgao = {$chave_orgao}";
       }
 
-      if (!empty($exercicio)) {
-        $aWhere[] = "extract(year from data_analise) = {$exercicio}";
+      if (!empty($chave_unidade)) {
+        $aWhere[] = "o58_unidade = {$chave_unidade}";
+      }
+
+      if (!empty($chave_exercicio)) {
+        $aWhere[] = "extract(year from data_analise) = {$chave_exercicio}";
+      }
+
+      if (!empty($periodo_inicial)) {
+        $aWhere[] = " data_analise >= '".implode("-",array_reverse(explode("/",$periodo_inicial)))."'";
+      }
+
+      if (!empty($periodo_final)) {
+        $aWhere[] = " data_analise <= '".implode("-",array_reverse(explode("/",$periodo_final)))."'";
       }
 
       $oDaoEmpenhoControleInterno =  new cl_empenhonotacontroleinterno();
@@ -145,17 +180,32 @@ require_once("dbforms/db_funcoes.php");
       $sCampos  .= "       when situacao_analise = " . ControleInterno::SITUACAO_RESSALVA            . " then 'Ressalva' ";
       $sCampos  .= "       when situacao_analise = " . ControleInterno::SITUACAO_IRREGULAR           . " then 'Irregular' ";
       $sCampos  .= "       when situacao_analise is null then 'Aguardando análise' end)::varchar as dl_Situação ";
-      //comentado porque ao utilizar o html na ressalva, as linhas não apareciam corretamente
-      /*$sCampos  .= "(select controlehistorico.ressalva::text
-                       from empenhonotacontroleinternohistorico controlehistorico
-                      where controlehistorico.empenhonotacontroleinterno = empenhonotacontroleinterno.sequencial
-                      order by controlehistorico.data desc, controlehistorico.hora desc, controlehistorico.sequencial desc limit 1) as dl_Ressalva";*/
-
+      if (!empty($filtro_alteracao)) {
+        $sCampos  .= ",      situacao_analise,";
+        $sCampos  .= "       numcgm_credor";
+      }
+      $sCampos  .= ", (select z01_cgccpf from cgm where z01_numcgm = numcgm_credor limit 1) as dl_CNPJ";
 
       $repassa   = array();
       $sOrder    = "plugins.controleinternocredor.sequencial, plugins.controleinternocredor.data_analise desc";
       $sSqlNotas = $oDaoEmpenhoControleInterno->sql_query_documento_analise($sCampos , $sOrder, $sWhere);
-      db_lovrot($sSqlNotas, 15, "()", "", $funcao_js, "", "NoMe", $repassa, false); ?>
+
+      if (!isset($pesquisa_chave)) {
+        db_lovrot($sSqlNotas, 15, "()", "", $funcao_js, "", "NoMe", $repassa, false); 
+      } else {
+        if ($pesquisa_chave!=null && $pesquisa_chave!="") {
+          $rsAnalise = $oDaoEmpenhoControleInterno->sql_record($sSqlNotas);
+          if ($oDaoEmpenhoControleInterno->numrows > 0) {
+            $oDados = db_utils::fieldsMemory($rsAnalise, 0);
+            echo "<script>".$funcao_js."($oDados->sequencial, null, null, null ,false);</script>";
+          } else {
+	          echo "<script>".$funcao_js."('Chave(".$pesquisa_chave.") não Encontrado',null, null, null, true);</script>";
+          }         
+        } else {
+          echo "<script>".$funcao_js."('',false);</script>";
+        }
+      }
+?>
     </td>
   </tr>
 </table>

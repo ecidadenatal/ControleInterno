@@ -34,7 +34,7 @@ class cl_controleinternocredor extends DAOBasica {
   public function aprovarAnalise($sequencial, $usuario_aprovacao, $data_aprovacao, $situacao_aprovacao) {
   		
   	//Busca os dados da controleinternocredor
-	$oDaoControleInternoCredor    = db_utils::getDao("controleinternocredor");
+    $oDaoControleInternoCredor    = db_utils::getDao("controleinternocredor");
     $rsBuscaControleInternoCredor = $oDaoControleInternoCredor->sql_record($oDaoControleInternoCredor->sql_query_file(null, "*", null, "sequencial = {$sequencial}"));
     if ($oDaoControleInternoCredor->numrows == 0) {
       throw new Exception("A análise de credor {$sequencial} não pôde ser encontrada.");
@@ -42,7 +42,7 @@ class cl_controleinternocredor extends DAOBasica {
     //Atualiza os dados de aprovação (usuário, data e situação final)
     $oControleInternoCredor = db_utils::fieldsMemory($rsBuscaControleInternoCredor, 0);
     $oDaoControleInternoCredor->numcgm_credor         = $oControleInternoCredor->numcgm_credor;
-    $oDaoControleInternoCredor->parecer               = $oControleInternoCredor->parecer;
+    $oDaoControleInternoCredor->parecer               = db_stdClass::normalizeStringJsonEscapeString($oControleInternoCredor->parecer);
     $oDaoControleInternoCredor->usuario_analise       = $oControleInternoCredor->usuario_analise;
     $oDaoControleInternoCredor->data_analise          = $oControleInternoCredor->data_analise;
     $oDaoControleInternoCredor->situacao_analise      = $oControleInternoCredor->situacao_analise;
@@ -57,30 +57,47 @@ class cl_controleinternocredor extends DAOBasica {
     }
 
     //Busca todos as análises de notas (empenhonotacontroleinterno) na tabela de vínculo
-	$oDaoCredorControleInterno    = db_utils::getDao('controleinternocredor_empenhonotacontroleinterno');
-	$rsBuscaCredorControleInterno = $oDaoCredorControleInterno->sql_record($oDaoCredorControleInterno->sql_query_file(null, "empenhonotacontroleinterno", null, "controleinternocredor = {$sequencial}"));
+    $oDaoCredorControleInterno    = db_utils::getDao('controleinternocredor_empenhonotacontroleinterno');
+    $rsBuscaCredorControleInterno = $oDaoCredorControleInterno->sql_record($oDaoCredorControleInterno->sql_query_file(null, "empenhonotacontroleinterno", null, "controleinternocredor = {$sequencial}"));
 
-	//Faz a alteração da situação de cada uma dessas análises de notas
-	for ($i = 0; $i < $oDaoCredorControleInterno->numrows; $i++) { 
-		$oCredorControleInterno = db_utils::fieldsMemory($rsBuscaCredorControleInterno, $i);
+    //Faz a alteração da situação de cada uma dessas análises de notas
+    for ($i = 0; $i < $oDaoCredorControleInterno->numrows; $i++) { 
+	 	$oCredorControleInterno = db_utils::fieldsMemory($rsBuscaCredorControleInterno, $i);
+  
+  	 	$oDaoControleInterno    = db_utils::getDao('empenhonotacontroleinterno');
+  	 	$rsBuscaControleInterno = $oDaoControleInterno->sql_record($oDaoControleInterno->sql_query_file(null, "*", null, "sequencial = {$oCredorControleInterno->empenhonotacontroleinterno}"));		
+  	 	if ($oDaoControleInterno->numrows == 0) {
+  	 	  throw new Exception("A análise de nota {$oCredorControleInterno->empenhonotacontroleinterno} não pôde ser encontrada.");
+  	 	}
 
-		$oDaoControleInterno    = db_utils::getDao('empenhonotacontroleinterno');
-		$rsBuscaControleInterno = $oDaoControleInterno->sql_record($oDaoControleInterno->sql_query_file(null, "*", null, "sequencial = {$oCredorControleInterno->empenhonotacontroleinterno}"));		
-		if ($oDaoControleInterno->numrows == 0) {
-		  throw new Exception("A análise de nota {$oCredorControleInterno->empenhonotacontroleinterno} não pôde ser encontrada.");
-		}
-    if ($oControleInternoCredor->situacao_analise == ControleInterno::SITUACAO_REGULAR || $oControleInternoCredor->situacao_analise == ControleInterno::SITUACAO_RESSALVA) {
-  		$oControleInterno = db_utils::fieldsMemory($rsBuscaControleInterno, 0);
-  		$oDaoControleInterno->nota     = $oControleInterno->nota;
-  		$oDaoControleInterno->situacao = $situacao_aprovacao;
-  		$oDaoControleInterno->alterar($oControleInterno->sequencial);
-  		
-      if ($oDaoControleInterno->erro_status == "0") {
-  		  throw new Exception("Erro ao alterar a análise de nota {$oCredorControleInterno->empenhonotacontroleinterno}.");
-  		}
+      if ($oControleInternoCredor->situacao_analise == ControleInterno::SITUACAO_REGULAR || $oControleInternoCredor->situacao_analise == ControleInterno::SITUACAO_RESSALVA) {
+    		$oControleInterno = db_utils::fieldsMemory($rsBuscaControleInterno, 0);
+    		$oDaoControleInterno->nota     = $oControleInterno->nota;
+    		$oDaoControleInterno->situacao = $situacao_aprovacao;
+    		$oDaoControleInterno->alterar($oControleInterno->sequencial);
+    		
+        if ($oDaoControleInterno->erro_status == "0") {
+    		  throw new Exception("Erro ao alterar a análise de nota {$oCredorControleInterno->empenhonotacontroleinterno}.");
+    		}
+      }
     }
-	}
+  }
 
- }
+  function getDadosAnalise($iAnalise) {
+
+    $sSql  = " select *, (select sum(e70_vlrliq) from empnotaele where e70_codnota = e69_codnota) as e70_vlrliq ";
+    $sSql .= " from plugins.empenhonotacontroleinterno ";
+    $sSql .= "   inner join empnota              on e69_codnota = empenhonotacontroleinterno.nota ";
+    $sSql .= "   inner join empempenho           on e60_numemp = e69_numemp ";
+    $sSql .= "   inner join empempaut            on e60_numemp = e61_numemp ";
+    $sSql .= "   inner join empautoriza          on e54_autori = e61_autori ";
+    $sSql .= "   inner join plugins.controleinternocredor_empenhonotacontroleinterno on plugins.controleinternocredor_empenhonotacontroleinterno.empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial";
+    $sSql .= "   inner join plugins.controleinternocredor on plugins.controleinternocredor.sequencial = plugins.controleinternocredor_empenhonotacontroleinterno.controleinternocredor";
+    $sSql .= "   inner join plugins.controleinternosituacoes on plugins.controleinternosituacoes.sequencial = plugins.controleinternocredor.situacao_analise";
+    $sSql .= "   inner join cgm                  on z01_numcgm = e60_numcgm ";
+    $sSql .= " where plugins.controleinternocredor.sequencial = $iAnalise";
+
+    return $sSql;
+  }
 
 }

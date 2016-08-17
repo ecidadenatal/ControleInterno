@@ -35,12 +35,7 @@ require_once "dbforms/db_funcoes.php";
 $oGet   = db_utils::postMemory($_GET);
 $oGet            = db_utils::postMemory($_GET);
 $sStyleInputText = 'width:25%;';
-$iOpcao = 1;
-
-$sFiltroValor = "";
-if (!empty($oGet->filtrovalor)) {
-  $sFiltroValor = "&filtrarvalor=1";
-}
+$iOpcao = 2;
 
 ?>
 <html xmlns="http://www.w3.org/1999/html">
@@ -80,22 +75,35 @@ if (!empty($oGet->filtrovalor)) {
   <form id="formLiberacaoEmpenho">
     <input id="liberacaoTipo" type="hidden" >
     <fieldset>
-      <legend><strong>Controle Interno - Liberação de Empenho</strong></legend>
-      <table>        
+      <legend><strong>Controle Interno - Alteração de Liberação de Empenho</strong></legend>
+      <table>
+        <tr>
+          <td>
+            <label for="analise_numero">
+              <?php db_ancora('Análise:', 'buscarAnalise(true)', $iOpcao, null, 'analise_ancora'); ?>
+            </label>
+          </td>
+          <td>
+            <?php
+            db_input('analise_numero', 10, 1, true, 'text', 22, 'onChange="buscarAnalise(false)"');
+            db_input('analise_descricao', 44, 0, true, 'text', 3);
+            ?>
+          </td>
+        </tr>        
         <tr> 
           <td  align="left" nowrap><strong>Órgão/Unidade: </strong></td>
           <td align="left" nowrap>
             <? 
-              db_input("orgao",1,1,true,"text",1, "", "", "", "", 2);  
-              db_input("unidade",1,1,true,"text",1, "", "", "", "", 2);  
+              db_input("orgao",1,1,true,"text",22, "", "", "", "", 2);  
+              db_input("unidade",1,1,true,"text",22, "", "", "", "", 2);  
             ?>
           </td>
         </tr>
         <tr> 
-          <td  align="left" nowrap title="<?=$Tz01_numcgm?>"><?db_ancora('<b>Credor:</b>',"js_pesquisa_cgm(true);",1);?></td>
+          <td  align="left" nowrap title="<?=$Tz01_numcgm?>"><b>Credor:</b></td>
           <td align="left" nowrap>
             <? 
-              db_input("z01_numcgm",6,$Iz01_numcgm,true,"text",4,"onchange='js_pesquisa_cgm(false);'");
+              db_input("z01_numcgm",6,$Iz01_numcgm,true,"text",22,"onchange='js_pesquisa_cgm(false);'");
               db_input("z01_nome2",40,"",true,"text",3);  
             ?>
           </td>
@@ -106,7 +114,7 @@ if (!empty($oGet->filtrovalor)) {
             <?php
               $oSituacoesControleInterno = db_utils::getDao("controleinternosituacoes");
               $rsSituacoes = $oSituacoesControleInterno->sql_record($oSituacoesControleInterno->sql_query(null, "sequencial, descricao", null, "tipo = 'Analista'"));
-              db_selectrecord('situacao', $rsSituacoes, true, $oGet->liberacaotipo, 'style="' . $sStyleInputText . '"', "", "", "", "js_pre_texto();", 1);
+              db_selectrecord('situacao', $rsSituacoes, true, $oGet->liberacaotipo, 'style="' . $sStyleInputText . '"', "", "", "", "", 1);
             ?>
           </td>
         </tr>
@@ -145,7 +153,7 @@ if (!empty($oGet->filtrovalor)) {
       </table>
     </fieldset>
     <p class="text-center">
-      <input type="button" id="btnSalvar" value="Salvar" />
+      <input type="button" id="btnSalvar" value="Alterar" />
       <input type="button" id="btnPesquisar" value="Pesquisar" />
     </p>
   </form>
@@ -165,64 +173,6 @@ if (!empty($oGet->filtrovalor)) {
     reiniciaJanela();
   };
 
-  //Coloca no textarea um "pré-texto" definido pela controladoria
-  function js_pre_texto() {
-
-    var oComboSituacao = $('situacao');
-    var iDiligencia = '<?php echo ControleInterno::SITUACAO_DILIGENCIA ?>';
-    var iIrregular  = '<?php echo ControleInterno::SITUACAO_IRREGULAR  ?>';
-    var iRessalva   = '<?php echo ControleInterno::SITUACAO_RESSALVA   ?>';
-    var iRegular    = '<?php echo ControleInterno::SITUACAO_REGULAR    ?>';
-    var sPreTexto   = "";
-
-    switch(oComboSituacao.options[oComboSituacao.selectedIndex].value) {
-      case iDiligencia:
-        sPreTexto = "De acordo com o que preceitua o art. 17 da Instrução Normativa nº 01/2015 - CGM e após a análise circunstanciada da matéria, propomos baixar o processo em DILIGÊNCIA para que sejam atendidas as exigências abaixo enumeradas, fixando-se o prazo de 10 (dez) dias para o atendimento.";
-      break; 
-      case iIrregular:
-        sPreTexto = "De acordo com o que preceitua o art. 18 da Instrução Normativa nº 01/2015 - CGM e após a análise circunstanciada da matéria evidenciamos o não cumprimento das exigências legais, encontrando-se a presente despesa IRREGULAR, pelos fatos e fundamentos enumerados abaixo:"; 
-      break; 
-      case iRessalva:
-        sPreTexto = "De acordo com o que preceitua o art. 16 da Instrução Normativa nº 01/2015 - CGM e após a análise circunstanciada da matéria, sugerimos o registro regular com RESSALVA da presente despesa, neste Departamento de Controle Interno."; 
-      break;
-      case iRegular:
-        sPreTexto = "De acordo com o que preceitua o art. 15 da Instrução Normativa nº 01/2015 - CGM e após a análise circunstanciada da matéria, sugerimos o registro REGULAR da presente despesa, podendo o processo ser encaminhado à origem para adoção das providências que o caso requer.";
-      break;
-      default:
-        alert("Não foi encontrado um pré-texto para a situação selecionada.");
-    }
-    tinyMCE.get('ressalva').setContent(sPreTexto);
-  }
-
-  function js_pesquisa_cgm(mostra){
-    if(mostra==true){
-      js_OpenJanelaIframe('top.corpo','func_nome',
-                          'func_cgm.php?funcao_js=parent.js_mostracgm1|z01_numcgm|z01_nome',
-                          'Pesquisa',true);
-    }else{
-       if($F('z01_numcgm') != ''){ 
-          js_OpenJanelaIframe('top.corpo','func_nome',
-                              'func_cgm.php?pesquisa_chave='+$F('z01_numcgm')+'&funcao_js=parent.js_mostracgm',
-                              'Pesquisa',false);
-       }else{
-         $('z01_nome2').value = ''; 
-       }
-    }
-  }
-  function js_mostracgm(erro,chave){
-    
-    $('z01_nome2').value = chave; 
-    if(erro==true){ 
-      $('z01_numcgm').value = ''; 
-      $('z01_numcgm').focus(); 
-    }
-  }
-  function js_mostracgm1(chave1,chave2){
-    $('z01_numcgm').value = chave1;  
-    $('z01_nome2').value  = chave2;
-    func_nome.hide();
-  }
-
   function js_salvar() {
     
     $('btnSalvar').disabled = true;
@@ -240,15 +190,14 @@ if (!empty($oGet->filtrovalor)) {
     }
     var sRessalva    = ressalvaText;
     var iSituacao    = $F('situacao');
-    var iNumCgm      = $F('z01_numcgm');
+    var iAnalise     = $F('analise_numero');
 
     var oParametro = {
-      'exec'      : 'liberarNotaEmpenhoAnalise',
+      'exec'      : 'alterarNotaEmpenhoAnalise',
       'aNotas'    : aNotas,
       'sRessalva' : encodeURIComponent(tagString(sRessalva)),
-      //'sRessalva' : sRessalva,
       'iSituacao' : iSituacao,
-      'iNumCgm'   : iNumCgm
+      'iAnalise'  : iAnalise
     };
 
     new AjaxRequest(sUrl, oParametro,
@@ -264,7 +213,7 @@ if (!empty($oGet->filtrovalor)) {
               var iHeight = (screen.availHeight - 40);
               var iWidth  = (screen.availWidth - 5);
               var sOpcoes = 'width=' + iWidth + ',height=' + iHeight + ',scrollbars=1,location=0';
-              var sQuery  = '?iNumeroInstrucao=' + oRetorno.iCodigoAnalise;
+              var sQuery  = '?iNumeroInstrucao=' + $F('analise_numero');
               var oJanela = window.open("emp4_documentocontroleinterno_002_natal.php" + sQuery, '', sOpcoes);
               
               oJanela.moveTo(0, 0);
@@ -297,8 +246,7 @@ if (!empty($oGet->filtrovalor)) {
     $('liquidacao_descricao').value = '';
     $('liquidacao_valor').value     = '';
 
-    js_pre_texto();
-    js_pesquisa_cgm(true);
+    buscarAnalise(true);
   }
 
   /**
@@ -337,7 +285,7 @@ if (!empty($oGet->filtrovalor)) {
    */
   function retornoLiquidacao(iCodigo, iCodigoEmpenho, sDescricao, nValor, lErro) {
     db_iframe_empempenho.hide();
-    retorno('liquidacao', iCodigo, sDescricao, nValor, lErro, false);
+    retornoLiquidacao1('liquidacao', iCodigo, sDescricao, nValor, lErro, false);
     $('empenho_codigo').value   = iCodigoEmpenho;
   }
 
@@ -349,7 +297,7 @@ if (!empty($oGet->filtrovalor)) {
    * @param {boolean} lErro             Se ocorreu erro.
    * @param {boolean} lLimpaLiquidacoes Se deve limpar as liquidações.
    */
-  function retorno(sCampo, iCodigo, sDescricao, nValor, lErro, lLimpaLiquidacoes) {
+  function retornoLiquidacao1(sCampo, iCodigo, sDescricao, nValor, lErro, lLimpaLiquidacoes) {
 
     //Verifica se deve remover todas as liquidações.
     if (lLimpaLiquidacoes && $(sCampo + '_numero').value != iCodigo) {
@@ -430,8 +378,6 @@ if (!empty($oGet->filtrovalor)) {
     oGridLiquidacoes.renderRows();
     aLiquidacoes = aLiquidacaoNova;
 
-    //Verifica se tem liquidações na grid para saber se libera/bloqueia o campo com o valor do repasse.
-    atualizaValorRepasse(nTotalRepasse, (aLiquidacoes.length > 0));
   }
 
   /**
@@ -487,6 +433,115 @@ if (!empty($oGet->filtrovalor)) {
     $('liquidacao_valor').value     = '';
   }
 
+  /**
+   * Faz a busca por análises.
+   * @param {boolean} lMostrar Se deve mostrar a janela para busca ou fazer busca pela chave.
+   */
+  function buscarAnalise(lMostrar) {
+
+    var sQueryString          = 'filtro_alteracao=1&funcao_js=parent.retornoAnalise|0|2|3|4|5|6';
+    var sArquivo              = 'func_controleinternocredor.php';
+    var sTituloTela           = 'Pesquisar Análise';
+    if (!lMostrar) {
+      sQueryString = 'pesquisa_chave=' + $F('analise_numero') + '&' + sQueryStringAdicional + '&funcao_js=parent.retornoAnalise';
+    }
+    js_OpenJanelaIframe('', 'db_iframe_analise', sArquivo + '?' + sQueryString, sTituloTela, lMostrar);
+  }
+
+  /**
+   * Retorno da busca por análise.
+   */
+  function retornoAnalise(iCodigo, iOrgao, iUnidade, sDescricao, iSituacao, iCredor, lErro) {
+    
+    db_iframe_analise.hide();
+    
+    $('analise_numero').value = iCodigo;
+    if (lErro) {
+      $('analise_numero').value = '';
+    }
+    $('orgao').value   = iOrgao;
+    $('unidade').value = iUnidade;
+    $('analise_descricao').value = sDescricao;
+    $('z01_numcgm').value = iCredor;
+    $('situacao').value = iSituacao;
+    listaLiquidacaoesAnalise();
+    js_pesquisa_cgm(false);
+  }
+
+  function js_pesquisa_cgm(mostra){
+    if(mostra==true){
+      js_OpenJanelaIframe('top.corpo','func_nome',
+                          'func_cgm.php?funcao_js=parent.js_mostracgm1|z01_numcgm|z01_nome',
+                          'Pesquisa',true);
+    }else{
+       if($F('z01_numcgm') != ''){ 
+          js_OpenJanelaIframe('top.corpo','func_nome',
+                              'func_cgm.php?pesquisa_chave='+$F('z01_numcgm')+'&funcao_js=parent.js_mostracgm',
+                              'Pesquisa',false);
+       }else{
+         $('z01_nome2').value = ''; 
+       }
+    }
+  }
+  function js_mostracgm(erro,chave){
+    
+    $('z01_nome2').value = chave; 
+    if(erro==true){ 
+      $('z01_numcgm').value = ''; 
+      $('z01_numcgm').focus(); 
+    }
+  }
+  function js_mostracgm1(chave1,chave2){
+    $('z01_numcgm').value = chave1;  
+    $('z01_nome2').value  = chave2;
+    func_nome.hide();
+  }
+
+  function listaLiquidacaoesAnalise() {
+    
+    var iAnalise = $F('analise_numero');
+
+    var oParam = {
+      'exec'      : 'buscarDetalhesAnalise',
+      'iAnalise'  : iAnalise
+    };
+
+    js_divCarregando('Aguarde, buscando dados da análise', 'msgBox');
+    var oAjax = new Ajax.Request(sUrl,
+                                 {
+                                   method: 'post',
+                                   parameters: 'json='+Object.toJSON(oParam),
+                                   onComplete: retornaLiquidacoesAnalise
+                                 }
+                               );
+  }
+
+  function retornaLiquidacoesAnalise(oAjax) {
+
+    js_removeObj('msgBox');
+    var oRetorno = eval("("+oAjax.responseText+")");
+
+    if (oRetorno.status == 1) {
+      tinyMCE.get('ressalva').setContent(oRetorno.sParecer);
+      
+      for (i = 0; i < oRetorno.aLiquidacoes.length; i++) {
+
+        //Monta a linha e coloca no array.
+        var aLinha = [oRetorno.aLiquidacoes[i].iCodigoEmpenho,
+                      oRetorno.aLiquidacoes[i].iCodigoNota,
+                      oRetorno.aLiquidacoes[i].sNomeCredor,
+                      js_formatar(oRetorno.aLiquidacoes[i].nValor, 'f'),
+                      montaBotaoRemover(aLiquidacoes.length)];
+        aLiquidacoes[aLiquidacoes.length] = aLinha;
+      }
+      oGridLiquidacoes.clearAll(true);
+      for (var iLinhas = 0; iLinhas < aLiquidacoes.length; iLinhas++) {
+
+        oGridLiquidacoes.addRow(aLiquidacoes[iLinhas], false);
+      }
+      oGridLiquidacoes.renderRows();
+    } 
+  }
   //Chama o método para criação da grid.
   criaGrid();
 

@@ -58,7 +58,7 @@ class ControleInternoDocumentoAnaliseHTML {
      */
     $sSqlUsuarioAnalista  = '( select usuario ';
     $sSqlUsuarioAnalista .= 'from plugins.empenhonotacontroleinternohistorico historico ';
-    $sSqlUsuarioAnalista .= 'where (situacao = '. ControleInterno::SITUACAO_REJEITADO_ANALISTA . ' or situacao = ' . ControleInterno::SITUACAO_LIBERADO_ANALISTA. ")";
+    $sSqlUsuarioAnalista .= 'where (situacao in ('. ControleInterno::SITUACAO_DILIGENCIA . ', '. ControleInterno::SITUACAO_REGULAR .', '. ControleInterno::SITUACAO_RESSALVA .', '. ControleInterno::SITUACAO_IRREGULAR .') )';
     $sSqlUsuarioAnalista .= 'and empenhonotacontroleinterno = empenhonotacontroleinterno.sequencial ';
     $sSqlUsuarioAnalista .= 'order by historico.data desc, historico.hora desc, historico.sequencial desc limit 1 )';
 
