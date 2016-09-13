@@ -46,3 +46,21 @@ insert into plugins.controleinternosituacoes select 5, 'Aprovada pelo Diretor', 
 insert into plugins.controleinternosituacoes select 6, 'Liberação Automática', null;
 insert into plugins.controleinternosituacoes select 7, 'Ressalva', 'Analista';
 insert into plugins.controleinternosituacoes select 8, 'Irregular', 'Analista';
+
+
+create table plugins.controleinternocredordesaprovacao (
+sequencial integer,
+controleinternocredor integer,
+usuario_aprovacao integer,
+data_aprovacao date,
+situacao_aprovacao integer,
+data_desaprovacao date,
+usuario_desaprovacao integer
+);
+
+CREATE SEQUENCE plugins.controleinternocredordesaprovacao_sequencial_seq
+INCREMENT 1
+MINVALUE 1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1;

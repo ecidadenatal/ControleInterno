@@ -69,6 +69,58 @@ try {
 
     break;
 
+    case 'desaprovarAnalise':
+
+      //Codigo da plugins.empenhonotacontroleinterno, que será desaprovada
+      $iCodigoAnalise = $oParam->iAnalise;
+      $aNotas = $oParam->aNotas;
+      $oDaoControleInternoCredor = db_utils::getDao("controleinternocredor");
+      $oDaoControleDesaprovacao = db_utils::getDao("controleinternocredordesaprovacao");
+      $oUsuario  = new UsuarioSistema(db_getsession('DB_id_usuario'));
+      $oUsuarioControladoria = db_utils::fieldsMemory(db_query("select * from plugins.usuariocontroladoria where numcgm = (select cgmlogin from db_usuacgm where id_usuario = {$oUsuario->getCodigo()})"), 0);
+            
+      for ($i=0; $i < count($aNotas); $i++) { 
+        if (SolicitacaoRepasseFinanceiro::notaTemSolicitacao($aNotas[$i])) {
+          throw new BusinessException("Não é possível desaprovar a liberação. A Nota de Liquidação já possui uma Solicitação de Repasse Financeiro.");
+        }
+      }
+
+      //Busca os dados da análise
+      $rsControleInternoCredor   = $oDaoControleInternoCredor->sql_record($oDaoControleInternoCredor->sql_query_file($iCodigoAnalise, "*", "", ""));
+      $oControleInternoCredor    = db_utils::fieldsMemory($rsControleInternoCredor, 0);
+
+      //Salva os dados na tabela de desaprovação de análise
+      $oDaoControleDesaprovacao->controleinternocredor = $iCodigoAnalise;
+      $oDaoControleDesaprovacao->usuario_aprovacao     = $oControleInternoCredor->usuario_aprovacao;
+      $oDaoControleDesaprovacao->data_aprovacao        = $oControleInternoCredor->data_aprovacao;
+      $oDaoControleDesaprovacao->situacao_aprovacao    = $oControleInternoCredor->situacao_aprovacao;
+      $oDaoControleDesaprovacao->data_desaprovacao     = date('d/m/Y', db_getsession('DB_datausu'));
+      $oDaoControleDesaprovacao->usuario_desaprovacao  = db_getsession('DB_id_usuario') == "1" ? "19" : $oUsuarioControladoria->numcgm;
+      $oDaoControleDesaprovacao->incluir(null);  
+      
+      if ($oDaoControleDesaprovacao->erro_status == "0") {
+        throw new Exception("Erro ao desaprovar a análise {$iCodigoAnalise}.");
+      }
+      //Altera os dados de aprovação da análise
+      $oDaoControleInternoCredor->numcgm_credor         = $oControleInternoCredor->numcgm_credor;
+      $oDaoControleInternoCredor->parecer               = $oControleInternoCredor->parecer;
+      $oDaoControleInternoCredor->usuario_analise       = $oControleInternoCredor->usuario_analise;
+      $oDaoControleInternoCredor->data_analise          = $oControleInternoCredor->data_analise;
+      $oDaoControleInternoCredor->situacao_analise      = $oControleInternoCredor->situacao_analise;
+      $oDaoControleInternoCredor->usuario_diretor_atual = $oControleInternoCredor->usuario_diretor_atual;
+      $oDaoControleInternoCredor->usuario_chefe_atual   = $oControleInternoCredor->usuario_chefe_atual;
+      $oDaoControleInternoCredor->usuario_aprovacao     = null;
+      $oDaoControleInternoCredor->data_aprovacao        = null;
+      $oDaoControleInternoCredor->situacao_aprovacao    = null;
+      $oDaoControleInternoCredor->alterar($oControleInternoCredor->sequencial);
+
+      if ($oDaoControleInternoCredor->erro_status == "0") {
+        throw new Exception("Erro ao atualizar os dados de aprovação da análise.");
+      }
+      $oRetorno->message = urlencode("Análise desaprovada com sucesso.");
+      
+    break;
+
     case 'liberarNotaEmpenhoAnalise':
 
       $sRessalva = db_stdClass::normalizeStringJsonEscapeString($oParam->sRessalva);

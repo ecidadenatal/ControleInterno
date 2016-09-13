@@ -122,6 +122,18 @@ require_once("dbforms/db_funcoes.php");
         $aWhere[] = "(situacao_aprovacao is null and situacao_analise is not null )";
       }
 
+      if (!empty($filtro_desaprovacao)) {
+        $aWhere[] = "situacao_aprovacao is not null";
+        $aWhere[] = "not exists(select 1 from plugins.solicitacaorepasseempnota
+                                           inner join plugins.empenhonotacontroleinterno on plugins.empenhonotacontroleinterno.nota = plugins.solicitacaorepasseempnota.empnota
+                                           inner join plugins.controleinternocredor_empenhonotacontroleinterno on empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial
+                                         where controleinternocredor = plugins.controleinternocredor.sequencial)";
+        $aWhere[] = "not exists(select 1 from empnotaele
+                                           inner join plugins.empenhonotacontroleinterno on plugins.empenhonotacontroleinterno.nota = e70_codnota
+                                           inner join plugins.controleinternocredor_empenhonotacontroleinterno on empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial
+                                          where controleinternocredor = plugins.controleinternocredor.sequencial and e70_vlrliq = 0)";
+      }
+
       if (!empty($filtrarvalor)) {
         $aWhere[] = "e60_vlremp <= 80000";
       }
@@ -180,7 +192,7 @@ require_once("dbforms/db_funcoes.php");
       $sCampos  .= "       when situacao_analise = " . ControleInterno::SITUACAO_RESSALVA            . " then 'Ressalva' ";
       $sCampos  .= "       when situacao_analise = " . ControleInterno::SITUACAO_IRREGULAR           . " then 'Irregular' ";
       $sCampos  .= "       when situacao_analise is null then 'Aguardando análise' end)::varchar as dl_Situação ";
-      if (!empty($filtro_alteracao)) {
+      if (!empty($filtro_alteracao) || !empty($filtro_desaprovacao)) {
         $sCampos  .= ",      situacao_analise,";
         $sCampos  .= "       numcgm_credor";
       }
@@ -199,7 +211,7 @@ require_once("dbforms/db_funcoes.php");
             $oDados = db_utils::fieldsMemory($rsAnalise, 0);
             echo "<script>".$funcao_js."($oDados->sequencial, null, null, null ,false);</script>";
           } else {
-	          echo "<script>".$funcao_js."('Chave(".$pesquisa_chave.") não Encontrado',null, null, null, true);</script>";
+            echo "<script>".$funcao_js."('Chave(".$pesquisa_chave.") não Encontrado',null, null, null, true);</script>";
           }         
         } else {
           echo "<script>".$funcao_js."('',false);</script>";

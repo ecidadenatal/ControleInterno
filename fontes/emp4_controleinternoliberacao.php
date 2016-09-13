@@ -451,6 +451,12 @@ if (!empty($oGet->filtrovalor)) {
       return false;
     }
 
+    //Verifica se a liquidação retornou da lookup
+    if ($F('liquidacao_descricao') == '') {
+      alert("Liquidação não encontrada.");
+      return false;
+    }
+
     if (sNomeCredor == "") {
       alert("Aguarde carregar as informações.");
       return false;

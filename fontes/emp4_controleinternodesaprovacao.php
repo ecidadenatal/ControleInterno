@@ -75,7 +75,7 @@ $iOpcao = 3;
   <form id="formLiberacaoEmpenho">
     <input id="liberacaoTipo" type="hidden" >
     <fieldset>
-      <legend><strong>Controle Interno - Exclusão de Liberação de Empenho</strong></legend>
+      <legend><strong>Controle Interno - Desaprovação de Análise</strong></legend>
       <table>
         <tr>
           <td>
@@ -140,7 +140,7 @@ $iOpcao = 3;
       </table>
     </fieldset>
     <p class="text-center">
-      <input type="button" id="btnExcluir" value="Excluir" />
+      <input type="button" id="btnDesaprovar" value="Desaprovar" />
       <input type="button" id="btnPesquisar" value="Pesquisar" />
     </p>
   </form>
@@ -155,44 +155,42 @@ $iOpcao = 3;
 
   window.onload = function() {
 
-    $('btnExcluir').addEventListener('click', js_excluir);
+    $('btnDesaprovar').addEventListener('click', js_desaprovar);
     $('btnPesquisar').addEventListener('click', reiniciaJanela);
     reiniciaJanela();
   };
 
-  function js_excluir() {
+  function js_desaprovar() {
     
-    //utilizando função do próprio TinyMCE para pegar o conteúdo do campo de texto
-    var ressalvaText = tinyMCE.get('ressalva').getContent();
-    
+    var iAnalise     = $F('analise_numero');
     var aNotas = [];
     for (var iIndice = 0; iIndice < aLiquidacoes.length; iIndice++) {
       aNotas[iIndice] = aLiquidacoes[iIndice][1];
     }
-    var sRessalva    = ressalvaText;
-    var iSituacao    = $F('situacao');
-    var iAnalise     = $F('analise_numero');
 
     var oParametro = {
-      'exec'      : 'excluirNotaEmpenhoAnalise',
-      'iAnalise'  : iAnalise
+      'exec'      : 'desaprovarAnalise',
+      'iAnalise'  : iAnalise,
+      'aNotas'    : aNotas
     };
 
-    new AjaxRequest(sUrl, oParametro,
-      function (oRetorno, lErro) {
+    if(confirm("Deseja mesmo desaprovar a análise "+iAnalise+"?")) {
+      new AjaxRequest(sUrl, oParametro,
+        function (oRetorno, lErro) {
 
-        if (oRetorno.status == 1) {
-          alert(oRetorno.message.urlDecode());
+          if (oRetorno.status == 1) {
+            alert(oRetorno.message.urlDecode());
 
-          if (oRetorno.erro == false) {
-            
-            reiniciaJanela();
+            if (oRetorno.erro == false) {
+              
+              reiniciaJanela();
+              
+            }
             
           }
-          
         }
-      }
-    ).setMessage(("Atualizando status da nota, aguarde.")).execute();
+      ).setMessage(("Desaprovando análise, aguarde.")).execute();
+    }
   }
 
   /**
@@ -255,7 +253,7 @@ $iOpcao = 3;
    */
   function buscarAnalise(lMostrar) {
 
-    var sQueryString          = 'filtro_alteracao=1&funcao_js=parent.retornoAnalise|0|2|3|4|5|6';
+    var sQueryString          = 'filtro_desaprovacao=1&funcao_js=parent.retornoAnalise|0|2|3|4|5|6';
     var sArquivo              = 'func_controleinternocredor.php';
     var sTituloTela           = 'Pesquisar Análise';
     if (!lMostrar) {

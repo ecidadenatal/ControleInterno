@@ -1,0 +1,121 @@
+<?xml version="1.0" standalone="yes" ?>
+<table name="plugins.controleinternocredordesaprovacao" description="Guarda os dados da desaprovação de uma análise." prefix="" label="Controle interno credor desaprovação." type="0">
+  <fields>
+    <field name="sequencial"
+           conteudo="int4"
+           description="Sequencial"
+           inivalue="0"
+           label="Sequencial"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Sequencial"
+           reference=""
+           ispk="t"
+           hassequence="t">
+      <sequence name="plugins.controleinternocredordesaprovacao_sequencial_seq" ></sequence>
+    </field>
+    <field name="controleinternocredor"
+           conteudo="int4"
+           description="Sequencial da plugins.controleinternocredor"
+           inivalue="0"
+           label="Sequencial da plugins.controleinternocredor"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Controle Interno Credor"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="usuario_aprovacao"
+           conteudo="int4"
+           description="CGM do usuário da aprovação"
+           inivalue="0"
+           label="CGM do usuário da aprovação"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Usuário aprovação"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="data_aprovacao"
+           conteudo="date"
+           description="Data da Aprovação"
+           inivalue="null"
+           label="Data da Aprovação"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Data da Aprovação"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="situacao_aprovacao"
+           conteudo="int4"
+           description="Status da aprovação"
+           inivalue="0"
+           label="Status da aprovação"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Status aprovação"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="data_desaprovacao"
+           conteudo="date"
+           description="Data da Desaprovação"
+           inivalue="null"
+           label="Data da Desaprovação"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Data da Desaprovação"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="usuario_desaprovacao"
+           conteudo="int4"
+           description="Usuário da Desaprovação"
+           inivalue="0"
+           label="Usuário da Desaprovação"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Usuário Desaprovação"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+  </fields>
+  <primarykey>
+    <fieldpk  name="sequencial"></fieldpk>
+  </primarykey>
+</table>
