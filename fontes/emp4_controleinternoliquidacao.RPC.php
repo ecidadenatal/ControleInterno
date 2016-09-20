@@ -60,14 +60,84 @@ try {
         if ($oDaoControleInternoCredor->erro_status == "0") {
           throw new Exception("Erro ao alterar a análise {$iCodigoAnalise}.");
         }
-      }      
+
+        $rsNotas = $oDaoControleInternoCredor->sql_record($oDaoControleInternoCredor->getDadosAnalise($iCodigoAnalise));
+
+        for ($i=0; $i < $oDaoControleInternoCredor->numrows; $i++) {
+
+          $oNota = db_utils::fieldsMemory($rsNotas, $i);
+
+          $sMensagemLiberacao = "";
+          $oNotaLiquidacao = new NotaLiquidacao($oNota->e69_codnota);
+          $oDaoEmpNota = new cl_empnota();
+
+          $aWhere = array(
+            "e69_numemp = {$oNotaLiquidacao->getNumeroEmpenho()}",
+            "e70_valor <> e70_vlranu",
+            "e70_valor = e70_vlrliq"
+          );
+          $sSqlEmpNota = $oDaoEmpNota->sql_query_valor_financeiro( null,
+                                                                   "e69_codnota, o56_elemento, e60_vlremp, e60_vlrliq, e60_vlranu",
+                                                                   "e69_codnota",
+                                                                   implode(' and ', $aWhere) );
+          $rsEmpNota = $oDaoEmpNota->sql_record($sSqlEmpNota);
+
+          if ($oDaoEmpNota->numrows > 0) {
+
+            $oEmpNota = db_utils::fieldsMemory($rsEmpNota, 0);
+
+            /**
+             * Verifica se o elemento do empenho se enquadra na análise automática
+             */
+            if ( ControleInterno::verificaAnaliseAutomatica($oEmpNota->o56_elemento)) {
+
+              $lUltimaLiquidacao = ($oEmpNota->e60_vlremp - $oEmpNota->e60_vlrliq - $oEmpNota->e60_vlranu) == 0;
+              /**
+               * Caso não seja a primeira nota de iquidação verifica se a primeira esta liberada
+               */
+              if ($oEmpNota->e69_codnota != $oNota->e69_codnota) {
+
+                $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
+
+                if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() != ControleInterno::SITUACAO_APROVADA) {
+
+                  $sMensagem  = "A nota {$oNota->e69_codnota} se enquadra na regra de análise automática. É necessário fazer a liberação ";
+                  $sMensagem .= "da primeira nota deste empenho para a liberação das demais.";
+                  throw new Exception($sMensagem);
+                }
+
+              } else if ($oParam->iSituacao == ControleInterno::SITUACAO_APROVADA) {
+
+                /**
+                 * Caso seja uma liberação do diretor, já autoriza as liquidações pendentes, exceto a última
+                 */
+                for ($iRow = 1; $iRow < $oDaoEmpNota->numrows; $iRow++) {
+
+                  $oDadosNota = db_utils::fieldsMemory($rsEmpNota, $iRow);
+                  $oControleInterno = new ControleInternoMovimento(db_utils::fieldsMemory($rsEmpNota, $iRow)->e69_codnota);
+
+                  if ( $oControleInterno->getSituacaoFinal() == ControleInterno::SITUACAO_AGUARDANDO_ANALISE && !($lUltimaLiquidacao && $iRow == $oDaoEmpNota->numrows-1) ) {
+
+                    $oControleInterno->criaAutorizacaoAutomatica();
+                  }
+                }
+
+                $sMensagemLiberacao  = "O empenho se enquadra na regra de análise automática. As próximas análises serão ";
+                $sMensagemLiberacao .= "feitas automaticamente após a liquidação do empenho. Caso existam notas pendentes para ";
+                $sMensagemLiberacao .= "análise, as mesmas serão liberadas automaticamente.";
+              } 
+            }
+          }
+        }     
+      }
+
       if ($iSituacao == ControleInterno::SITUACAO_APROVADA) {
-        $oRetorno->message = urlencode("Análises aprovadas.");
+        $oRetorno->message = urlencode("Análises aprovadas.". (!empty($sMensagemLiberacao) ? "\n\n{$sMensagemLiberacao}" : ""));
       } else {
         $oRetorno->message = urlencode("Análises rejeitadas.");
       }
 
-    break;
+      break;
 
     case 'desaprovarAnalise':
 
@@ -146,7 +216,7 @@ try {
       $oControleInternoCredor->incluir(null);
 
       for ($i = 0; $i < count($aNotas); $i++) { 
-          
+
         $sWhere = "e69_codnota = {$aNotas[$i]} and ((not exists (select 1 from plugins.empenhonotacontroleinterno where nota = e69_codnota and situacao != ".ControleInterno::SITUACAO_REJEITADA.")
                       or (select situacao_aprovacao from plugins.controleinternocredor
                                               inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
@@ -161,72 +231,8 @@ try {
           throw new BusinessException("A nota {$aNotas[$i]} já se encontra numa análise pendente de aprovação.");
         }
           
-        $sMensagemLiberacao = "";
-        $oNotaLiquidacao = new NotaLiquidacao($aNotas[$i]);
-
         if (SolicitacaoRepasseFinanceiro::notaTemSolicitacao($aNotas[$i])) {
           throw new BusinessException("Não é possível alterar a liberação. A Nota de Liquidação já possui uma Solicitação de Repasse Financeiro.");
-        }
-
-        $oDaoEmpNota = new cl_empnota();
-
-        $aWhere = array(
-          "e69_numemp = {$oNotaLiquidacao->getNumeroEmpenho()}",
-          "e70_valor <> e70_vlranu",
-          "e70_valor = e70_vlrliq"
-        );
-        $sSqlEmpNota = $oDaoEmpNota->sql_query_valor_financeiro( null,
-                                                                 "e69_codnota, o56_elemento, e60_vlremp, e60_vlrliq, e60_vlranu",
-                                                                 "e69_codnota",
-                                                                 implode(' and ', $aWhere) );
-        $rsEmpNota = $oDaoEmpNota->sql_record($sSqlEmpNota);
-
-        if ($oDaoEmpNota->numrows > 0) {
-
-          $oEmpNota = db_utils::fieldsMemory($rsEmpNota, 0);
-
-          /**
-           * Verifica se o elemento do empenho se enquadra na análise automática
-           */
-          if ( ControleInterno::verificaAnaliseAutomatica($oEmpNota->o56_elemento)) {
-
-            $lUltimaLiquidacao = ($oEmpNota->e60_vlremp - $oEmpNota->e60_vlrliq - $oEmpNota->e60_vlranu) == 0;
-            /**
-             * Caso não seja a primeira nota de iquidação verifica se a primeira esta liberada
-             */
-            if ($oEmpNota->e69_codnota != $aNotas[$i]) {
-
-              $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
-
-              if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() != ControleInterno::SITUACAO_APROVADA) {
-
-                $sMensagem  = "A nota {$aNotas[$i]} se enquadra na regra de análise automática. É necessário fazer a liberação ";
-                $sMensagem .= "da primeira nota deste empenho para a liberação das demais.";
-                throw new Exception($sMensagem);
-              }
-
-            } else if ($oParam->iSituacao == ControleInterno::SITUACAO_APROVADA) {
-
-              /**
-               * Caso seja uma liberação do diretor, já autoriza as liquidações pendentes, exceto a última
-               */
-              for ($iRow = 1; $iRow < $oDaoEmpNota->numrows; $iRow++) {
-
-                $oDadosNota = db_utils::fieldsMemory($rsEmpNota, $iRow);
-                $oControleInterno = new ControleInternoMovimento(db_utils::fieldsMemory($rsEmpNota, $iRow)->e69_codnota);
-
-                if ( $oControleInterno->getSituacaoFinal() == ControleInterno::SITUACAO_AGUARDANDO_ANALISE
-                  && !($lUltimaLiquidacao && $iRow == $oDaoEmpNota->numrows-1) ) {
-
-                  $oControleInterno->criaAutorizacaoAutomatica();
-                }
-              }
-
-              $sMensagemLiberacao  = "O empenho se enquadra na regra de análise automática. As próximas análises serão ";
-              $sMensagemLiberacao .= "feitas automaticamente após a liquidação do empenho. Caso existam notas pendentes para ";
-              $sMensagemLiberacao .= "análise, as mesmas serão liberadas automaticamente.";
-            }
-          }
         }
 
         $oControleInterno = new ControleInternoMovimento($aNotas[$i]);
@@ -247,8 +253,6 @@ try {
       if (in_array($oParam->iSituacao, array(ControleInterno::SITUACAO_DILIGENCIA, ControleInterno::SITUACAO_IRREGULAR))) {
         $sMensagem = "As notas informadas não foram liberadas para pagamento.\nInforme o responsável pelas notas para as devidas providências.";
       }
-
-      $sMensagem = $sMensagem . (!empty($sMensagemLiberacao) ? "\n\n{$sMensagemLiberacao}" : "");
 
       $oRetorno->iCodigoAnalise = $oControleInternoCredor->sequencial;
       $oRetorno->message = urlencode($sMensagem);

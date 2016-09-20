@@ -206,6 +206,7 @@ abstract class ControleInterno {
 
     $aLiberacao = array(
       self::SITUACAO_REGULAR,
+      self::SITUACAO_RESSALVA,
       self::SITUACAO_APROVADA,
       self::SITUACAO_LIBERADO_AUTOMATICO
     );
