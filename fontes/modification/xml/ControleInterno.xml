@@ -44,7 +44,7 @@
    *
    * @throws Exception
    */
-  private function analiseAutomaticaControleInterno($iCodigoNota, $sEstrutural, $iNumeroEmpenho) {
+    private function analiseAutomaticaControleInterno($iCodigoNota, $sEstrutural, $iNumeroEmpenho) {
 
     if (!ControleInterno::verificaAnaliseAutomatica($sEstrutural)) {
       return;
@@ -75,12 +75,19 @@
       return;
     }
 
-    //Verifica se a primeira liquidação já foi liberada.
-    $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
-    if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() < ControleInterno::SITUACAO_APROVADA) {
+    //Verifica se alguma liquidação já foi liberada.
+    for ($i=0; $i < pg_numrows($rsEmpNota); $i++) { 
+      $oEmpNota = db_utils::fieldsMemory($rsEmpNota, $i);
+      $oControleInternoLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
+      if ($oControleInternoLiquidacao->getSituacaoFinal() == ControleInterno::SITUACAO_APROVADA) {
+        $lTemAprovada = true;
+        break;
+      }      
+    }
+    if (!$lTemAprovada) {
       return;
     }
-
+    
     //Cria uma aprovação automática.
     $oControleInterno = new ControleInternoMovimento($iCodigoNota);
     $oControleInterno->criaAutorizacaoAutomatica();

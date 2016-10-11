@@ -86,28 +86,30 @@ try {
 
             $oEmpNota = db_utils::fieldsMemory($rsEmpNota, 0);
 
-            /**
-             * Verifica se o elemento do empenho se enquadra na análise automática
-             */
             if ( ControleInterno::verificaAnaliseAutomatica($oEmpNota->o56_elemento)) {
 
+              //Pega situação da análise para ver se é diligência, regular, ressalva ou irregular
+              $rsSituacaoInicial = db_query("SELECT situacao_analise
+                                      FROM plugins.controleinternocredor 
+                                          INNER JOIN plugins.controleinternocredor_empenhonotacontroleinterno ON controleinternocredor = plugins.controleinternocredor.sequencial
+                                          INNER JOIN plugins.empenhonotacontroleinterno ON plugins.empenhonotacontroleinterno.sequencial = empenhonotacontroleinterno
+                                      WHERE nota = {$oEmpNota->e69_codnota} ORDER BY plugins.empenhonotacontroleinterno.sequencial DESC limit 1");
+              $iSituacaoInicial  = db_utils::fieldsMemory($rsSituacaoInicial, 0)->situacao_analise;
+              
               $lUltimaLiquidacao = ($oEmpNota->e60_vlremp - $oEmpNota->e60_vlrliq - $oEmpNota->e60_vlranu) == 0;
               /**
                * Caso não seja a primeira nota de iquidação verifica se a primeira esta liberada
                */
               if ($oEmpNota->e69_codnota != $oNota->e69_codnota) {
-
                 $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
-
                 if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() != ControleInterno::SITUACAO_APROVADA) {
 
-                  $sMensagem  = "A nota {$oNota->e69_codnota} se enquadra na regra de análise automática. É necessário fazer a liberação ";
+                  $sMensagem  = "Esta nota se enquadra na regra de análise automática. É necessário fazer a liberação ";
                   $sMensagem .= "da primeira nota deste empenho para a liberação das demais.";
                   throw new Exception($sMensagem);
                 }
 
-              } else if ($oParam->iSituacao == ControleInterno::SITUACAO_APROVADA) {
-
+              } else if ($oParam->iSituacao == ControleInterno::SITUACAO_APROVADA && in_array($iSituacaoInicial, array(ControleInterno::SITUACAO_REGULAR, ControleInterno::SITUACAO_RESSALVA))) {
                 /**
                  * Caso seja uma liberação do diretor, já autoriza as liquidações pendentes, exceto a última
                  */
@@ -116,7 +118,8 @@ try {
                   $oDadosNota = db_utils::fieldsMemory($rsEmpNota, $iRow);
                   $oControleInterno = new ControleInternoMovimento(db_utils::fieldsMemory($rsEmpNota, $iRow)->e69_codnota);
 
-                  if ( $oControleInterno->getSituacaoFinal() == ControleInterno::SITUACAO_AGUARDANDO_ANALISE && !($lUltimaLiquidacao && $iRow == $oDaoEmpNota->numrows-1) ) {
+                  if ( $oControleInterno->getSituacaoFinal() == ControleInterno::SITUACAO_AGUARDANDO_ANALISE
+                    && !($lUltimaLiquidacao && $iRow == $oDaoEmpNota->numrows-1) ) {
 
                     $oControleInterno->criaAutorizacaoAutomatica();
                   }
@@ -128,8 +131,8 @@ try {
               } 
             }
           }
-        }     
-      }
+        }
+      }     
 
       if ($iSituacao == ControleInterno::SITUACAO_APROVADA) {
         $oRetorno->message = urlencode("Análises aprovadas.". (!empty($sMensagemLiberacao) ? "\n\n{$sMensagemLiberacao}" : ""));
@@ -165,6 +168,7 @@ try {
       $oDaoControleDesaprovacao->data_aprovacao        = $oControleInternoCredor->data_aprovacao;
       $oDaoControleDesaprovacao->situacao_aprovacao    = $oControleInternoCredor->situacao_aprovacao;
       $oDaoControleDesaprovacao->data_desaprovacao     = date('d/m/Y', db_getsession('DB_datausu'));
+      //Coloquei pra colocar o CGM da DBSeller em casos onde a desaprovação seja feita pelo suporte
       $oDaoControleDesaprovacao->usuario_desaprovacao  = db_getsession('DB_id_usuario') == "1" ? "19" : $oUsuarioControladoria->numcgm;
       $oDaoControleDesaprovacao->incluir(null);  
       
@@ -292,15 +296,20 @@ try {
          */
         if ( ControleInterno::verificaAnaliseAutomatica($oEmpNota->o56_elemento)) {
 
+          //Pega situação da análise para ver se é diligência, regular, ressalva ou irregular
+          $rsSituacaoInicial = $oDaoEmpNota->sql_record("SELECT situacao_analise
+                                  FROM plugins.controleinternocredor 
+                                      INNER JOIN plugins.controleinternocredor_empenhonotacontroleinterno ON controleinternocredor = plugins.controleinternocredor.sequencial
+                                      INNER JOIN plugins.empenhonotacontroleinterno ON plugins.empenhonotacontroleinterno.sequencial = empenhonotacontroleinterno
+                                  WHERE nota = {$oEmpNota->e69_codnota} ORDER BY plugins.empenhonotacontroleinterno.sequencial DESC limit 1");
+          $iSituacaoInicial  = db_utils::fieldsMemory($rsSituacaoInicial, 0)->situacao_analise;
           $lUltimaLiquidacao = ($oEmpNota->e60_vlremp - $oEmpNota->e60_vlrliq - $oEmpNota->e60_vlranu) == 0;
-
           /**
            * Caso não seja a primeira nota de iquidação verifica se a primeira esta liberada
            */
           if ($oEmpNota->e69_codnota != $oParam->iCodigoNota) {
 
             $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
-
             if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() < ControleInterno::SITUACAO_APROVADA) {
 
               $sMensagem  = "Esta nota se enquadra na regra de análise automática. É necessário fazer a liberação ";
@@ -308,8 +317,9 @@ try {
               throw new Exception($sMensagem);
             }
 
-          } else if ($oParam->iSituacao == ControleInterno::SITUACAO_APROVADA) {
-
+          } else if ($oParam->iSituacao == ControleInterno::SITUACAO_APROVADA 
+                      && ($iSituacaoInicial == ControleInterno::SITUACAO_REGULAR
+                           || $iSituacaoInicial == ControleInterno::SITUACAO_RESSALVA)) {
             /**
              * Caso seja uma liberação do diretor, já autoriza as liquidações pendentes, exceto a última
              */
