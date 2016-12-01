@@ -72,8 +72,14 @@ class cl_empenhonotacontroleinterno extends DAOBasica {
    */
   function sql_query_documento_analise($sCampos = '*', $sOrder = '', $sWhere = '') {
 
-    $aDotacoesUsuario = PermissaoUsuarioEmpenho::getDotacoesUsuario(db_getsession('DB_id_usuario'), db_getsession('DB_anousu'), "M");
-    $sDotacoesUsuario = implode(", ", $aDotacoesUsuario);
+    $aDotacoesUsuario = array();
+    for ($i = db_getsession('DB_anousu')-4; $i <= db_getsession('DB_anousu'); $i++) { 
+      $aDotacoesUsuario[$i] = PermissaoUsuarioEmpenho::getDotacoesUsuario(db_getsession('DB_id_usuario'), $i, "M");
+    }
+    $sDotacoesUsuario = "";
+    foreach ($aDotacoesUsuario as $iExercicio => $aExercicio) {
+      $sDotacoesUsuario .= implode(", ", $aDotacoesUsuario[$iExercicio]);
+    }
 
     $sSql  = " select {$sCampos} ";
     $sSql .= " from plugins.empenhonotacontroleinterno ";

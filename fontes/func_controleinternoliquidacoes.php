@@ -98,7 +98,12 @@ $Se60_numemp = "Seq. Empenho";
       <?php
 
       $aWhere   = array("e60_instit = ".db_getsession("DB_instit"));
-      $aWhere[] = "(e70_vlrliq > 0 and e53_vlrpag = 0)";
+      //$aWhere[] = "(e70_vlrliq > 0 and e53_vlrpag = 0)";
+      if (!empty($filtrar_para_emissao)) {
+        $aWhere[] = "(e70_vlrliq > 0)";
+      } else {
+         $aWhere[] = "(e70_vlrliq > 0 and e53_vlrpag = 0)";
+      }
       $sWhereDotacoes = PermissaoUsuarioEmpenho::getDotacoesPorAnoDoUsuario(
         db_getsession('DB_id_usuario'),
         db_getsession('DB_anousu'),
@@ -109,14 +114,14 @@ $Se60_numemp = "Seq. Empenho";
       }
 
       if (!empty($filtrar_notas_para_analista)) {
-        $aWhere[] = "((not exists (select 1 from plugins.empenhonotacontroleinterno where nota = e69_codnota and situacao != ".ControleInterno::SITUACAO_REJEITADA.")
+                $aWhere[] = "((not exists (select 1 from plugins.empenhonotacontroleinterno where nota = e69_codnota and situacao != ".ControleInterno::SITUACAO_REJEITADA.")
                       or (select situacao_aprovacao from plugins.controleinternocredor
                                               inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
-                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial limit 1) = ". ControleInterno::SITUACAO_REJEITADA ."
+                                                                                                                 and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial order by controleinternocredor.sequencial desc limit 1) = ". ControleInterno::SITUACAO_REJEITADA ."
                       or (select situacao_aprovacao from plugins.controleinternocredor
                                               inner join plugins.controleinternocredor_empenhonotacontroleinterno on controleinternocredor = plugins.controleinternocredor.sequencial
                                                                                                                  and empenhonotacontroleinterno = plugins.empenhonotacontroleinterno.sequencial
-                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.") limit 1) = ". ControleInterno::SITUACAO_APROVADA ."))";
+                                              where plugins.controleinternocredor.situacao_analise in (".ControleInterno::SITUACAO_DILIGENCIA.", ".ControleInterno::SITUACAO_IRREGULAR.") order by controleinternocredor.sequencial desc limit 1) = ". ControleInterno::SITUACAO_APROVADA ."))";
       }
 
       if (!empty($chave_e60_codemp)) {

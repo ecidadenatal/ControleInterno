@@ -131,7 +131,7 @@ from
         inner join empnota on controlenota.nota = e69_codnota
         inner join empempenho on e69_numemp = e60_numemp
         inner join empempaut on e60_numemp = e61_numemp
-        inner join empautorizaprocesso on e61_autori = e150_empautoriza
+         left join empautorizaprocesso on e61_autori = e150_empautoriza
         inner join orcdotacao on e60_coddot = o58_coddot and e60_anousu = o58_anousu
         inner join orcunidade on o58_orgao = o41_orgao and o58_unidade = o41_unidade and o58_anousu = o41_anousu
         inner join orcorgao on o58_orgao = o40_orgao and o58_anousu = o40_anousu
