@@ -491,7 +491,11 @@ if (!empty($oGet->filtrovalor)) {
     $('liquidacao_numero').value    = '';
     $('liquidacao_descricao').value = '';
     $('liquidacao_valor').value     = '';
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> a4b0e76dd17bbd4ef08d1a02d2109e93247bdc0c
     //Travar para o usuário não poder mais alterar órgão e unidade
     $('orgao').readOnly = true;
     $('unidade').readOnly = true;
