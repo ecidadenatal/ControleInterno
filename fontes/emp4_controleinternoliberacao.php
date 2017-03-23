@@ -491,6 +491,10 @@ if (!empty($oGet->filtrovalor)) {
     $('liquidacao_numero').value    = '';
     $('liquidacao_descricao').value = '';
     $('liquidacao_valor').value     = '';
+    
+    //Travar para o usuário não poder mais alterar órgão e unidade
+    $('orgao').readOnly = true;
+    $('unidade').readOnly = true;
   }
 
   //Chama o método para criação da grid.

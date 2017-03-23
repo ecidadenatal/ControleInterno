@@ -102,7 +102,7 @@ try {
                */
               if ($oEmpNota->e69_codnota != $oNota->e69_codnota) {
                 $oControleInternoPrimeiraLiquidacao = new ControleInternoMovimento($oEmpNota->e69_codnota);
-                if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() != ControleInterno::SITUACAO_APROVADA) {
+                if ($oControleInternoPrimeiraLiquidacao->getSituacaoFinal() != ControleInterno::SITUACAO_APROVADA && in_array($iSituacaoInicial, array(ControleInterno::SITUACAO_REGULAR, ControleInterno::SITUACAO_RESSALVA))) {
 
                   $sMensagem  = "Esta nota se enquadra na regra de análise automática. É necessário fazer a liberação ";
                   $sMensagem .= "da primeira nota deste empenho para a liberação das demais.";

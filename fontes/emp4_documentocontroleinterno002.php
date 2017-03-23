@@ -36,7 +36,6 @@ $oGET = db_utils::postMemory($_GET);
 
 try {
 
-	//$oDocumento = new ControleInternoDocumentoAnalise($oGET->iCodigoNota);
 	$oDocumento = new ControleInternoDocumentoAnaliseHTML($oGET->iCodigoNota);
 	$oDocumento->emitir();
 } catch (Exception $e) {
