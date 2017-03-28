@@ -284,7 +284,7 @@
                         array_unshift($aMesesCompetencia, ""); 
                         db_select("mes_competencia",$aMesesCompetencia, true, 1, "style='width: 50px;'");   
           
-                        $ano_inicio = db_getsession("DB_anousu") - 2;
+                        $ano_inicio = db_getsession("DB_anousu") - 3;
                         $aAnosCompetencia = array_combine(range($ano_inicio, db_getsession("DB_anousu")), range($ano_inicio, db_getsession("DB_anousu")));
                         array_unshift($aAnosCompetencia, "");
                         db_select("ano_competencia", $aAnosCompetencia, true, 1, "style='width: 80px;'");  
