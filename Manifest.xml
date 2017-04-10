@@ -21,7 +21,6 @@
 
 <!-- model -->
 <file name="ControleInternoDocumentoAnaliseHTML.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnaliseHTML.model.php" />
-<file name="ControleInternoDocumentoAnaliseHTML_novo.model.php"  path="/model/empenho/relatorio/ControleInternoDocumentoAnaliseHTML_novo.model.php" />
 <file name="ControleInternoDocumentoAnalise.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnalise.model.php" />
 <file name="ControleInternoMovimento.model.php"    path="/model/empenho/ControleInternoMovimento.model.php" />
 <file name="ControleInterno.model.php"    path="/model/empenho/ControleInterno.model.php" />
@@ -31,8 +30,6 @@
 <file name="ControleInterno.xml"    path="/modification/xml/ControleInterno.xml" />
 <file name="emp4_documentocontroleinterno002.php"    path="/emp4_documentocontroleinterno002.php" />
 <file name="emp4_documentocontroleinterno001.php"    path="/emp4_documentocontroleinterno001.php" />
-<file name="emp4_documentocontroleinterno_002_natal.php"    path="/emp4_documentocontroleinterno_002_natal.php" />
-<file name="emp4_documentocontroleinterno_001_natal.php"    path="/emp4_documentocontroleinterno_001_natal.php" />
 <file name="emp4_controleinternoliberacao.php"    path="/emp4_controleinternoliberacao.php" />
 <file name="plugins.liquidacaocompetencia.dd.xml"    path="/dd/tabelas/plugins.liquidacaocompetencia.dd.xml" />
 <file name="plugins.empenhonotacontroleinternohistoricousuario.dd.xml"    path="/dd/tabelas/plugins.empenhonotacontroleinternohistoricousuario.dd.xml" />

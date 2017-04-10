@@ -59,31 +59,19 @@ $oGet            = db_utils::postMemory($_GET);
   <div class="container">
     <div style="width: 400px;">
         <fieldset>
-          <legend class="bold">Controle Interno - Emissão da Nota de Análise</legend>
+          <legend class="bold">Controle Interno - Emissão da Nota de Análise (Nova)</legend>
           <table style="width: 100%">
             <tr>
               <td class="headerLabel">
                 <Label for="empenho">
                 <?php
-                db_ancora('Empenho:', 'js_pesquisa_empenho()', 1);
+                db_ancora('Instrução Técnica:', 'js_pesquisa_analise()', 1);
                 ?>
                 </Label>
               </td>
               <td>
                 <?php
-                db_input('empenho', 15, false, true, 'text', 3, null, null, null, null);
-                ?>
-              </td>
-            </tr>
-            <tr>
-              <td class="headerLabel">
-                <label for="nota">
-                  Nota:
-                </label>
-              </td>
-              <td>
-                <?php
-                db_input('nota', 15, false, true, 'text', 3, null, null, null, null);
+                db_input('instrucaotecnica', 15, false, true, 'text', 3, null, null, null, null);
                 ?>
               </td>
             </tr>
@@ -110,39 +98,31 @@ $oGet            = db_utils::postMemory($_GET);
 
   function reiniciaJanela() {
 
-    $('empenho').value  = '';
-    $('nota').value     = '';
-    js_pesquisa_empenho();
+    $('instrucaotecnica').value  = '';
+    js_pesquisa_analise();
   }
 
-  function js_pesquisa_empenho() {
+  function js_pesquisa_analise() {
 
     js_OpenJanelaIframe( 'top.corpo',
-                         'db_iframe_empempenho',
-                         'func_controleinternoliquidacoes.php?filtrar_para_emissao=1&funcao_js=parent.js_mostra_empenho|e60_numemp|e69_codnota|e70_vlrliq',
-                         'Pesquisa de Notas', true );
+                         'db_iframe_analise',
+                         'func_controleinternocredor.php?emiterelatorio=1&funcao_js=parent.js_mostra_analise|0',
+                         'Pesquisa de Instruções Técnicas', true );
   }
 
-  function js_mostra_empenho(iNumeroEmpenho, iCodigoNota) {
+  function js_mostra_analise(iNumeroInstrucao) {
 
-    $('empenho').value = iNumeroEmpenho;
-    $('nota').value    = iCodigoNota;
-    db_iframe_empempenho.hide();
+    $('instrucaotecnica').value = iNumeroInstrucao;
+    db_iframe_analise.hide();
   }
 
   function emissaoDocumento() {
 
-    if (empty($F('nota'))) {
-
-      alert('O campo Nota é obrigatório.');
-      return;
-    }
-
     var iHeight = (screen.availHeight - 40);
     var iWidth  = (screen.availWidth - 5);
     var sOpcoes = 'width=' + iWidth + ',height=' + iHeight + ',scrollbars=1,location=0';
-    var sQuery  = '?iCodigoNota=' + $F('nota');
-    var oJanela = window.open("emp4_documentocontroleinterno002.php" + sQuery, '', sOpcoes);
+    var sQuery  = '?iNumeroInstrucao=' + $F('instrucaotecnica');
+    var oJanela = window.open("emp4_documentocontroleinterno_002_natal.php" + sQuery, '', sOpcoes);
 
     oJanela.moveTo(0, 0);
   }
