@@ -20,7 +20,7 @@
  *   Cópia da licença no diretório licenca/licenca_en.txt
  *                                 licenca/licenca_pt.txt
  */
-class ControleInternoDocumentoAnaliseHTML_novo {
+class ControleInternoDocumentoAnaliseHTML {
 	
 	/**
 	 *
@@ -64,6 +64,7 @@ class ControleInternoDocumentoAnaliseHTML_novo {
                               cgmcredor.z01_nome as interessado,
                               analise.usuario_analise cgm_analista,
                               cgmanalista.z01_nome as nome_analista,
+                              rhanalista.rh01_regist as matricula_analista,
                               usuanalista.lotacao as lotacao_analista,
                               usuanalista.cargo as cargo_analista,
                               analise.usuario_diretor_atual as cgm_diretor_atual,
@@ -76,6 +77,7 @@ class ControleInternoDocumentoAnaliseHTML_novo {
                               usuchefe.cargo as cargo_chefe_atual
                          from plugins.controleinternocredor analise
                                left join cgm cgmanalista                              on analise.usuario_analise       = cgmanalista.z01_numcgm
+                               left join rhpessoal rhanalista						  on rhanalista.rh01_numcgm        = cgmanalista.z01_numcgm
                                left join plugins.usuariocontroladoria usuanalista     on analise.usuario_analise       = usuanalista.numcgm
                                left join cgm cgmdiretor                               on analise.usuario_diretor_atual = cgmdiretor.z01_numcgm
                                left join plugins.usuariocontroladoria usudiretor      on analise.usuario_diretor_atual = usudiretor.numcgm
@@ -309,7 +311,7 @@ class ControleInternoDocumentoAnaliseHTML_novo {
 		          $this->html .= "<td align='center' width=50%>
 		                            __________________________________ <br>
 		                            {$this->oDados->nome_analista} <br>
-		                            {$this->oDados->cargo_analista}
+		                            {$this->oDados->cargo_analista} - {$this->oDados->matricula_analista}
 		                          </td>";
 		        }
 		$this->html .= "        </tr>

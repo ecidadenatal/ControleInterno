@@ -54,6 +54,7 @@ try {
         $oUsuario  = new UsuarioSistema(db_getsession('DB_id_usuario'));
         $oUsuarioControladoria = db_utils::fieldsMemory(db_query("select * from plugins.usuariocontroladoria where numcgm = (select cgmlogin from db_usuacgm where id_usuario = {$oUsuario->getCodigo()})"), 0);
 
+        $oDaoEmpNotaControleInterno = db_utils::getDao("empenhonotacontroleinterno");
         $oDaoControleInternoCredor = db_utils::getDao("controleinternocredor");
         $oDaoControleInternoCredor->aprovarAnalise($iCodigoAnalise, $oUsuarioControladoria->numcgm, date('d/m/Y', db_getsession('DB_datausu')), $iSituacao);
         
@@ -81,6 +82,14 @@ try {
                                                                    "e69_codnota",
                                                                    implode(' and ', $aWhere) );
           $rsEmpNota = $oDaoEmpNota->sql_record($sSqlEmpNota);
+
+          $rsEmpNotaControleInterno = $oDaoEmpNotaControleInterno->sql_record($oDaoEmpNotaControleInterno->sql_query_file(null, "*", null, "nota = {$oNota->e69_codnota}"));
+          $oEmpNotaControleInterno  = db_utils::fieldsMemory($rsEmpNotaControleInterno, 0);
+          if ($iSituacao == ControleInterno::SITUACAO_APROVADA) {
+            $oDaoEmpNotaControleInterno->nota = $oEmpNotaControleInterno->nota;
+            $oDaoEmpNotaControleInterno->situacao = $oParam->iSituacao;
+            $oDaoEmpNotaControleInterno->alterar($oEmpNotaControleInterno->sequencial);
+          } 
 
           if ($oDaoEmpNota->numrows > 0) {
 
@@ -600,6 +609,12 @@ try {
             $oControleCredorNota->empenhonotacontroleinterno = $oControleInterno->getCodigo();
             $oControleCredorNota->controleinternocredor      = $oControleInternoCredor->sequencial;
             $oControleCredorNota->incluir(null);
+          } else {
+            $rsEmpNotaControleInterno = $oDaoEmpenhoControleInterno->sql_record($oDaoEmpenhoControleInterno->sql_query_file(null, "*", null, "nota = {$aLiquidacoesAtual[$i]}"));
+            $oEmpNotaControleInterno = db_utils::fieldsMemory($rsEmpNotaControleInterno, 0);
+            $oDaoEmpenhoControleInterno->nota = $oEmpNotaControleInterno->nota;
+            $oDaoEmpenhoControleInterno->situacao = $oParam->iSituacao;
+            $oDaoEmpenhoControleInterno->alterar($oEmpNotaControleInterno->sequencial);
           }
         }
         //Verifica se foram excluídas liquidações
