@@ -78,6 +78,8 @@ class ControleInternoDocumentoAnaliseHTML {
                          from plugins.controleinternocredor analise
                                left join cgm cgmanalista                              on analise.usuario_analise       = cgmanalista.z01_numcgm
                                left join rhpessoal rhanalista						  on rhanalista.rh01_numcgm        = cgmanalista.z01_numcgm
+                               left join rhpessoalmov on rh01_regist = rh02_regist and rh02_anousu = extract(year from analise.data_analise) and rh02_mesusu = extract(month from analise.data_analise)
+                               left join rhpesrescisao on rh05_seqpes = rh02_seqpes
                                left join plugins.usuariocontroladoria usuanalista     on analise.usuario_analise       = usuanalista.numcgm
                                left join cgm cgmdiretor                               on analise.usuario_diretor_atual = cgmdiretor.z01_numcgm
                                left join plugins.usuariocontroladoria usudiretor      on analise.usuario_diretor_atual = usudiretor.numcgm
@@ -101,7 +103,7 @@ class ControleInternoDocumentoAnaliseHTML {
                                                                                                             and o58_anousu                                   = o40_anousu
                                        ) T on analise.sequencial = T.controleinternocredor
                            inner join cgm cgmcredor on analise.numcgm_credor = cgmcredor.z01_numcgm
-                       where analise.sequencial = {$iInstrucaoTecnica}";
+                       where analise.sequencial = {$iInstrucaoTecnica} and rh05_seqpes is null";
 		$rsDados = pg_exec ( $sSqlDados );
 		if (pg_numrows ( $rsDados ) > 0) {
 			
