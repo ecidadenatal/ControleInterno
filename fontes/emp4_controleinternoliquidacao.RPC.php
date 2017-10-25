@@ -83,6 +83,8 @@ try {
                                                                    implode(' and ', $aWhere) );
           $rsEmpNota = $oDaoEmpNota->sql_record($sSqlEmpNota);
 
+          /*
+          @todo verificar essa logica pois nao faz sentido
           $rsEmpNotaControleInterno = $oDaoEmpNotaControleInterno->sql_record($oDaoEmpNotaControleInterno->sql_query_file(null, "*", null, "nota = {$oNota->e69_codnota}"));
           $oEmpNotaControleInterno  = db_utils::fieldsMemory($rsEmpNotaControleInterno, 0);
           if ($iSituacao == ControleInterno::SITUACAO_APROVADA) {
@@ -90,7 +92,8 @@ try {
             $oDaoEmpNotaControleInterno->situacao = $oParam->iSituacao;
             $oDaoEmpNotaControleInterno->alterar($oEmpNotaControleInterno->sequencial);
           } 
-
+          */
+          
           if ($oDaoEmpNota->numrows > 0) {
 
             $oEmpNota = db_utils::fieldsMemory($rsEmpNota, 0);
@@ -171,6 +174,15 @@ try {
       $rsControleInternoCredor   = $oDaoControleInternoCredor->sql_record($oDaoControleInternoCredor->sql_query_file($iCodigoAnalise, "*", "", ""));
       $oControleInternoCredor    = db_utils::fieldsMemory($rsControleInternoCredor, 0);
 
+      $sSqlEmpenhoNotaControleInterno = "update plugins.empenhonotacontroleinterno set situacao = situacao_analise
+                                           from plugins.controleinternocredor_empenhonotacontroleinterno
+                                                inner join plugins.controleinternocredor on controleinternocredor.sequencial = controleinternocredor_empenhonotacontroleinterno.controleinternocredor
+                                          where empenhonotacontroleinterno.sequencial = empenhonotacontroleinterno
+                                            and controleinternocredor = {$iCodigoAnalise}";
+      if (!db_query($sSqlEmpenhoNotaControleInterno)) {
+      	throw new Exception("Erro realizando anteração na situação da nota de liquição");
+      }
+      
       //Salva os dados na tabela de desaprovação de análise
       $oDaoControleDesaprovacao->controleinternocredor = $iCodigoAnalise;
       $oDaoControleDesaprovacao->usuario_aprovacao     = $oControleInternoCredor->usuario_aprovacao;

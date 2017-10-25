@@ -114,7 +114,7 @@ $iOpcao = 2;
             <?php
               $oSituacoesControleInterno = db_utils::getDao("controleinternosituacoes");
               $rsSituacoes = $oSituacoesControleInterno->sql_record($oSituacoesControleInterno->sql_query(null, "sequencial, descricao", null, "tipo = 'Analista'"));
-              db_selectrecord('situacao', $rsSituacoes, true, $oGet->liberacaotipo, 'style="' . $sStyleInputText . '"', "", "", "", "", 1);
+              db_selectrecord('situacao', $rsSituacoes, true, $oGet->liberacaotipo, 'style="' . $sStyleInputText . '"', "", "", "", "js_pre_texto();", 1);
             ?>
           </td>
         </tr>
@@ -173,6 +173,34 @@ $iOpcao = 2;
     reiniciaJanela();
   };
 
+  //Coloca no textarea um "pré-texto" definido pela controladoria
+  function js_pre_texto() {
+
+    var iSituacao = $F('situacao');
+    var iDiligencia = '<?php echo ControleInterno::SITUACAO_DILIGENCIA ?>';
+    var iIrregular  = '<?php echo ControleInterno::SITUACAO_IRREGULAR  ?>';
+    var iRessalva   = '<?php echo ControleInterno::SITUACAO_RESSALVA   ?>';
+    var iRegular    = '<?php echo ControleInterno::SITUACAO_REGULAR    ?>';
+    var sPreTexto   = "";
+
+    switch(iSituacao) {
+      case iDiligencia:
+        sPreTexto = "De acordo com o que preceitua o art. 17 da Instrução Normativa nº 01/2015 - CGM e após a análise circunstanciada da matéria, propomos baixar o processo em DILIGÊNCIA para que sejam atendidas as exigências abaixo enumeradas, fixando-se o prazo de 10 (dez) dias para o atendimento.";
+      break; 
+      case iIrregular:
+        sPreTexto = "De acordo com o que preceitua o art. 18 da Instrução Normativa nº 01/2015 - CGM e após a análise circunstanciada da matéria evidenciamos o não cumprimento das exigências legais, encontrando-se a presente despesa IRREGULAR, pelos fatos e fundamentos enumerados abaixo:"; 
+      break; 
+      case iRessalva:
+        sPreTexto = "De acordo com o que preceitua o art. 16 da Instrução Normativa nº 01/2015 - CGM e após a análise circunstanciada da matéria, sugerimos o registro regular com RESSALVA da presente despesa, neste Departamento de Controle Interno."; 
+      break;
+      case iRegular:
+        sPreTexto = "De acordo com o que preceitua o art. 15 da Instrução Normativa nº 01/2015 - CGM e após a análise circunstanciada da matéria, sugerimos o registro REGULAR da presente despesa, podendo o processo ser encaminhado à origem para adoção das providências que o caso requer.";
+      break;
+    }
+    tinyMCE.get('ressalva').setContent(sPreTexto);
+    
+  }
+  
   function js_salvar() {
     
     $('btnSalvar').disabled = true;
@@ -246,6 +274,7 @@ $iOpcao = 2;
     $('liquidacao_descricao').value = '';
     $('liquidacao_valor').value     = '';
 
+    js_pre_texto();
     buscarAnalise(true);
   }
 
