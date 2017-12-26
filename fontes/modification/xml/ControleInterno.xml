@@ -316,15 +316,16 @@
     </operation>    
     
     <operation>
-      <search regex="true"><![CDATA[(var\s*oInfoNota\s*=\s*new\s*Object\(\s*\)\s*;)]]></search>
+      <search regex="true"><![CDATA[(oParam.e03_numeroprocesso\s*=\s*encodeURIComponent\(\$F\('e03_numeroprocesso'\)\);)]]></search>
       <add>
-        <![CDATA[
+        <![CDATA[$1
+        
       /* [Inicio plugin ControleInterno - LiquidacaoCompetencia] */  
         oParam.mes_competencia = $F('mes_competencia');
         var ano_competencia = document.getElementById('ano_competencia');
         oParam.ano_competencia = ano_competencia.options[ano_competencia.selectedIndex].innerHTML;          
       /* [Fim plugin ControleInterno - LiquidacaoCompetencia] */
-      $1]]>
+      ]]>
       </add>
     </operation>
   </file>
@@ -377,7 +378,7 @@
       <add>
         <![CDATA[$1
         
-          /* [Inicio plugin LiquidacaoCompetencia] */        
+          /* [Inicio plugin LiquidacaoCompetencia 1] */        
           $oLiquidacaoCompetencia = db_utils::getDao("liquidacaocompetencia");
           foreach ($aOrdensGeradas as $iIndOrdensGeradas => $iOrdem) {
             $oLiquidacaoCompetencia->pagordem = $iOrdem;
@@ -388,7 +389,7 @@
                throw new Exception($oLiquidacaoCompetencia->erro_msg);
             }
           }
-          /* [Fim plugin LiquidacaoCompetencia] */
+          /* [Fim plugin LiquidacaoCompetencia 1] */
                    
           $4]]>
       </add>
@@ -397,7 +398,7 @@
       <search regex="true"><![CDATA[(}\n*.*echo\s*\$oRetorno;\n*.*}\s*else\s*{\s*\n*.*urlencode\(\$objEmpenho->sMsgErro\),\s*"e50_codord"\s*=>\s*null\s*\);)]]></search>
       <add>
         <![CDATA[
-          /* [Inicio plugin LiquidacaoCompetencia] */        
+          /* [Inicio plugin LiquidacaoCompetencia 2] */        
           $oLiquidacaoCompetencia = db_utils::getDao("liquidacaocompetencia");
           $oLiquidacaoCompetencia->pagordem = $oDadosRetorno->e50_codord;
           $oLiquidacaoCompetencia->mes   = $objJson->mes_competencia;
@@ -406,7 +407,7 @@
           if ($oLiquidacaoCompetencia->erro_status == 0) {
             throw new Exception($oLiquidacaoCompetencia->erro_msg);
           }
-          /* [Fim plugin LiquidacaoCompetencia] */
+          /* [Fim plugin LiquidacaoCompetencia 2] */
                     
         $1
         ]]>
