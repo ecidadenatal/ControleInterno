@@ -12,11 +12,12 @@
     $aConfiguracao = PluginService::getPluginConfig ( $oPlugin );
     
     $sInstituicoesSemAnalise = $aConfiguracao["InstituicaoSemAnalise"];
-    //$aInstituicoesSemAnalise = explode ( ",", $aConfiguracao["InstituicaoSemAnalise"] );
-
-    $sWhere .= " and (exists(select 1 from plugins.empenhonotacontroleinterno ";
-    $sWhere .= "              where nota = e71_codnota and situacao in (" . ControleInterno::SITUACAO_APROVADA . ", ". ControleInterno::SITUACAO_LIBERADO_AUTOMATICO ."))";
-    $sWhere .= " or e60_instit in (".$sInstituicoesSemAnalise."))";
+    $sWhere .= " and (exists (select 1
+		                        from plugins.controleinternoempenho
+		                             inner join plugins.controleinternoempenhoempempenho on controleinternoempenhoempempenho.controleinternoempenho = controleinternoempenho.sequencial
+		                       where controleinternoempenhoempempenho.empempenho = empempenho.e60_numemp
+		                         and situacao_aprovacao in (5)) 
+    		             or e60_instit in (".$sInstituicoesSemAnalise."))";
           ]]>
       </add>
     </operation>
@@ -268,13 +269,20 @@
 
   <file path='forms/db_frmliquidasemordem.php'>
     <operation>
-      <search regex="true"><![CDATA[(e69_localrecebimento.*\n*.*<\/td>\n*.*<\/tr>)]]></search>
+      <search regex="true" flag="U"><![CDATA[(db_input\(\'e69_localrecebimento.*\?>(.*\n*)*<\/tr>)]]></search>
       <add>
         <![CDATA[$1
         
           <!--[Extensao ControleInterno - LiquidacaoCompetencia] inclusao do campo -->
           <? 
             if ($operacao == 1) {
+            
+              $iEdicaoCampo = 1;
+              //plugin OrdenadorPagamentoEmpenho
+              if (isset($lUtilizaOrdenadorPagamentoEmpenho)) {
+                $iEdicaoCampo = 3;
+              } 
+              
               echo "<tr>
                       <td> 
                        <strong>Mês de Competência:</strong> 
@@ -282,12 +290,14 @@
                       <td colspan='3'>";                
                         $aMesesCompetencia = array_combine(range(1,12), range(1,12));
                         array_unshift($aMesesCompetencia, ""); 
-                        db_select("mes_competencia",$aMesesCompetencia, true, 1, "style='width: 50px;'");   
+                        db_select("mes_competencia",$aMesesCompetencia, true, $iEdicaoCampo, "style='width: 50px;'");   
           
-                        $ano_inicio = db_getsession("DB_anousu") - 3;
-                        $aAnosCompetencia = array_combine(range($ano_inicio, db_getsession("DB_anousu")), range($ano_inicio, db_getsession("DB_anousu")));
-                        array_unshift($aAnosCompetencia, "");
-                        db_select("ano_competencia", $aAnosCompetencia, true, 1, "style='width: 80px;'");  
+                        $aAnosCompetencia = array();
+                        $aAnosCompetencia[""] = "";
+                        for ($iAno = db_getsession("DB_anousu") - 3; $iAno <= db_getsession("DB_anousu"); $iAno++) {
+                        	$aAnosCompetencia[$iAno] = $iAno;
+                        }
+                        db_select("ano_competencia", $aAnosCompetencia, true, $iEdicaoCampo, "style='width: 80px;'");  
               echo "  </td>
                     </tr>"; 
             } 
@@ -316,16 +326,14 @@
     </operation>    
     
     <operation>
-      <search regex="true"><![CDATA[(oParam.e03_numeroprocesso\s*=\s*encodeURIComponent\(\$F\('e03_numeroprocesso'\)\);)]]></search>
+      <search regex="true"><![CDATA[(oParam.oInfoNota\s*=\s*oInfoNota\s*;)]]></search>
       <add>
-        <![CDATA[$1
-        
+        <![CDATA[
       /* [Inicio plugin ControleInterno - LiquidacaoCompetencia] */  
         oParam.mes_competencia = $F('mes_competencia');
-        var ano_competencia = document.getElementById('ano_competencia');
-        oParam.ano_competencia = ano_competencia.options[ano_competencia.selectedIndex].innerHTML;          
+        oParam.ano_competencia = $F('ano_competencia');
       /* [Fim plugin ControleInterno - LiquidacaoCompetencia] */
-      ]]>
+      $1]]>
       </add>
     </operation>
   </file>
@@ -378,7 +386,7 @@
       <add>
         <![CDATA[$1
         
-          /* [Inicio plugin LiquidacaoCompetencia 1] */        
+          /* [Inicio plugin LiquidacaoCompetencia] */        
           $oLiquidacaoCompetencia = db_utils::getDao("liquidacaocompetencia");
           foreach ($aOrdensGeradas as $iIndOrdensGeradas => $iOrdem) {
             $oLiquidacaoCompetencia->pagordem = $iOrdem;
@@ -389,7 +397,7 @@
                throw new Exception($oLiquidacaoCompetencia->erro_msg);
             }
           }
-          /* [Fim plugin LiquidacaoCompetencia 1] */
+          /* [Fim plugin LiquidacaoCompetencia] */
                    
           $4]]>
       </add>
@@ -398,7 +406,7 @@
       <search regex="true"><![CDATA[(}\n*.*echo\s*\$oRetorno;\n*.*}\s*else\s*{\s*\n*.*urlencode\(\$objEmpenho->sMsgErro\),\s*"e50_codord"\s*=>\s*null\s*\);)]]></search>
       <add>
         <![CDATA[
-          /* [Inicio plugin LiquidacaoCompetencia 2] */        
+          /* [Inicio plugin LiquidacaoCompetencia] */        
           $oLiquidacaoCompetencia = db_utils::getDao("liquidacaocompetencia");
           $oLiquidacaoCompetencia->pagordem = $oDadosRetorno->e50_codord;
           $oLiquidacaoCompetencia->mes   = $objJson->mes_competencia;
@@ -407,15 +415,15 @@
           if ($oLiquidacaoCompetencia->erro_status == 0) {
             throw new Exception($oLiquidacaoCompetencia->erro_msg);
           }
-          /* [Fim plugin LiquidacaoCompetencia 2] */
-                    
+          /* [Fim plugin LiquidacaoCompetencia] */
+			    
         $1
         ]]>
       </add>
     </operation>
 
     <operation>
-      <search regex="true"><![CDATA[(ClassificacaoCredor::validaDatas\(.*\)\s*;)]]></search>
+      <search regex="true"><![CDATA[(\$oListaClassificacaoCredor->validarDatas\(.*\);)]]></search>
       <add>
         <![CDATA[$oPlugin = new Plugin(null, 'ControleInterno');
       $aConfiguracoes = PluginService::getPluginConfig($oPlugin);
@@ -431,33 +439,6 @@
       <search regex="true"><![CDATA[(var\s*sJson\s*=\s*'{"exec":\s*")(getMovimentos)(".*"params".*;)]]></search>
       <add>
         <![CDATA[$1$2ParaRetencao$3]]>
-      </add>
-    </operation>
-  </file>
-
-  <file path='func_empnota001.php'>
-    <operation>
-      <search regex="true"><![CDATA[(\$sSqlNotasLiq\s*.=\s*"\s*e69_dtnota\s*,\s*"\s*;)]]></search>
-      <add>
-        <![CDATA[$1
-  $sSqlNotasLiq .= "(case situacao";       
-  $sSqlNotasLiq .= "    when 1 then 'Aguardando Análise'";       
-  $sSqlNotasLiq .= "    when 2 then 'Diligência'";
-  $sSqlNotasLiq .= "    when 3 then 'Regular'";
-  $sSqlNotasLiq .= "    when 4 then 'Rejeitado'";
-  $sSqlNotasLiq .= "    when 5 then 'Liberado'";
-  $sSqlNotasLiq .= "    when 6 then 'Análise Automática'";
-  $sSqlNotasLiq .= "    when 7 then 'Ressalva'";      
-  $sSqlNotasLiq .= "    when 8 then 'Irregular'";             
-  $sSqlNotasLiq .= "    else 'Sem análise' end)  as dl_Situação,   ";]]>
-      </add>
-    </operation>
-
-    <operation>
-      <search regex="true"><![CDATA[(\$sSqlNotasLiq\s*.=\s*"\s*left\s*join\s*pagordemele\s*on\s*e71_codord\s*=\s*e53_codord\s*"\s*;)]]></search>
-      <add>
-        <![CDATA[$1
-  $sSqlNotasLiq .= "       left  join plugins.empenhonotacontroleinterno on nota = e69_codnota ";]]>
       </add>
     </operation>
   </file>

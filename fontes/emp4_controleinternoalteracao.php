@@ -200,7 +200,6 @@ $iOpcao = 2;
     tinyMCE.get('ressalva').setContent(sPreTexto);
     
   }
-  
   function js_salvar() {
     
     $('btnSalvar').disabled = true;

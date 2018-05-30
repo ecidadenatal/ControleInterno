@@ -1,41 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <plugin name="ControleInterno" label="Controle Interno" plugin-version="1.5" ecidade-version="2.3.37" id-modulo="398">
+  <plugin name="ControleInterno" label="Controle Interno" plugin-version="1.6" ecidade-version="2.3.37" id-modulo="398">
 
     <files>
+       <file name="emp4_controleinternoalteracao.php" path="/emp4_controleinternoalteracao.php" />
+       <file name="emp4_controleinternoaprovacao.php" path="/emp4_controleinternoaprovacao.php" />
+       <file name="emp4_controleinternodesaprovacao.php" path="/emp4_controleinternodesaprovacao.php" />
+       <file name="emp4_controleinternoexclusao.php" path="/emp4_controleinternoexclusao.php" />
+       <file name="emp4_controleinternoliberacao.php" path="/emp4_controleinternoliberacao.php" />
+       <file name="emp4_controleinternoliquidacao.RPC.php" path="/emp4_controleinternoliquidacao.RPC.php" />
+       <file name="emp4_documentocontroleinterno_001_natal.php" path="/emp4_documentocontroleinterno_001_natal.php" />
+       <file name="emp4_documentocontroleinterno001.php" path="/emp4_documentocontroleinterno001.php" />
+       <file name="emp4_documentocontroleinterno_002_natal.php" path="/emp4_documentocontroleinterno_002_natal.php" />
+       <file name="emp4_documentocontroleinterno002.php" path="/emp4_documentocontroleinterno002.php" />
+       <file name="func_controleinternocredor.php" path="/func_controleinternocredor.php" />
+       <file name="func_controleinternoliquidacoes.php" path="/func_controleinternoliquidacoes.php" />
 
-<!-- rpc -->
-<file name="emp4_controleinternoliquidacao.RPC.php"    path="/emp4_controleinternoliquidacao.RPC.php" />
+       <file name="db_controleinternocredor_classe.php" path="/classes/db_controleinternocredor_classe.php" />
+       <file name="db_controleinternocredordesaprovacao_classe.php" path="/classes/db_controleinternocredordesaprovacao_classe.php" />
+       <file name="db_controleinternocredorempenho_classe.php" path="/classes/db_controleinternocredorempenho_classe.php" />
+       <file name="db_controleinternocredor_empenhonotacontroleinterno_classe.php" path="/classes/db_controleinternocredor_empenhonotacontroleinterno_classe.php" />
+       <file name="db_controleinternosituacoes_classe.php" path="/classes/db_controleinternosituacoes_classe.php" />
+       <file name="db_controleinternosituacoesempenho_classe.php" path="/classes/db_controleinternosituacoesempenho_classe.php" />
+       <file name="db_empenhonotacontroleinterno_classe.php" path="/classes/db_empenhonotacontroleinterno_classe.php" />
+       <file name="db_empenhonotacontroleinternohistorico_classe.php" path="/classes/db_empenhonotacontroleinternohistorico_classe.php" />
+       <file name="db_empenhonotacontroleinternohistoricousuario_classe.php" path="/classes/db_empenhonotacontroleinternohistoricousuario_classe.php" />
+       <file name="db_liquidacaocompetencia_classe.php" path="/classes/db_liquidacaocompetencia_classe.php" />
 
+       <file name="ControleInternoDocumentoAnaliseHTML.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnaliseHTML.model.php" />
+       <file name="ControleInternoDocumentoAnalise.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnalise.model.php" />
+       <file name="ControleInternoMovimento.model.php"    path="/model/empenho/ControleInternoMovimento.model.php" />
+       <file name="ControleInterno.model.php"    path="/model/empenho/ControleInterno.model.php" />
 
-<!-- lookup -->
-<file name="func_controleinternoliquidacoes.php"    path="/func_controleinternoliquidacoes.php" />
+       <file name="plugins.controleinternocredor.dd.xml"                            path="/dd/tabelas/plugins.controleinternocredor.dd.xml" />
+       <file name="plugins.controleinternocredordesaprovacao.dd.xml"                path="/dd/tabelas/plugins.controleinternocredordesaprovacao.dd.xml" />
+       <file name="plugins.controleinternocredor_empenhonotacontroleinterno.dd.xml" path="/dd/tabelas/plugins.controleinternocredor_empenhonotacontroleinterno.dd.xml" />
+       <file name="plugins.controleinternosituacoes.dd.xml"                         path="/dd/tabelas/plugins.controleinternosituacoes.dd.xml" />
+       <file name="plugins.empenhonotacontroleinterno.dd.xml"                       path="/dd/tabelas/plugins.empenhonotacontroleinterno.dd.xml" />
+       <file name="plugins.empenhonotacontroleinternohistorico.dd.xml"              path="/dd/tabelas/plugins.empenhonotacontroleinternohistorico.dd.xml" />
+       <file name="plugins.empenhonotacontroleinternohistoricousuario.dd.xml"       path="/dd/tabelas/plugins.empenhonotacontroleinternohistoricousuario.dd.xml" />
+       <file name="plugins.liquidacaocompetencia.dd.xml"                            path="/dd/tabelas/plugins.liquidacaocompetencia.dd.xml" />
 
-
-<!-- classe -->
-<file name="db_liquidacaocompetencia_classe.php"    path="/classes/db_liquidacaocompetencia_classe.php" />
-<file name="db_empenhonotacontroleinternohistoricousuario_classe.php"    path="/classes/db_empenhonotacontroleinternohistoricousuario_classe.php" />
-<file name="db_empenhonotacontroleinternohistorico_classe.php"    path="/classes/db_empenhonotacontroleinternohistorico_classe.php" />
-<file name="db_empenhonotacontroleinterno_classe.php"    path="/classes/db_empenhonotacontroleinterno_classe.php" />
-
-
-<!-- model -->
-<file name="ControleInternoDocumentoAnaliseHTML.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnaliseHTML.model.php" />
-<file name="ControleInternoDocumentoAnalise.model.php"    path="/model/empenho/relatorio/ControleInternoDocumentoAnalise.model.php" />
-<file name="ControleInternoMovimento.model.php"    path="/model/empenho/ControleInternoMovimento.model.php" />
-<file name="ControleInterno.model.php"    path="/model/empenho/ControleInterno.model.php" />
-
-
-<!-- outro -->
-<file name="ControleInterno.xml"    path="/modification/xml/ControleInterno.xml" />
-<file name="emp4_documentocontroleinterno002.php"    path="/emp4_documentocontroleinterno002.php" />
-<file name="emp4_documentocontroleinterno001.php"    path="/emp4_documentocontroleinterno001.php" />
-<file name="emp4_controleinternoliberacao.php"    path="/emp4_controleinternoliberacao.php" />
-<file name="plugins.liquidacaocompetencia.dd.xml"    path="/dd/tabelas/plugins.liquidacaocompetencia.dd.xml" />
-<file name="plugins.empenhonotacontroleinternohistoricousuario.dd.xml"    path="/dd/tabelas/plugins.empenhonotacontroleinternohistoricousuario.dd.xml" />
-<file name="plugins.empenhonotacontroleinternohistorico.dd.xml"    path="/dd/tabelas/plugins.empenhonotacontroleinternohistorico.dd.xml" />
-<file name="plugins.empenhonotacontroleinterno.dd.xml"    path="/dd/tabelas/plugins.empenhonotacontroleinterno.dd.xml" />
-
+       <file name="ControleInterno.xml"    path="/modification/xml/ControleInterno.xml" />
+       
     </files>
 
     <estrutura install="/instalacao.sql" uninstall="/desinstalacao.sql">
@@ -46,12 +53,12 @@
 
     <menus>
       <menu type="4">
-        <item name="Controle Interno" file="" liberado-cliente="true" >
-          <item name="Liberação Inicial Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=1&amp;filtrovalor=1" liberado-cliente="true" />
-          <item name="Liberação Inicial" file="emp4_controleinternoliberacao.php?liberacaotipo=1" liberado-cliente="true" />
-          <item name="Liberação Final" file="emp4_controleinternoliberacao.php?liberacaotipo=2" liberado-cliente="true" />
-          <item name="Liberação Final Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=2&amp;filtrovalor=1" liberado-cliente="true" />
-          <item name="Emissão da Nota de Análise" file="emp4_documentocontroleinterno001.php" liberado-cliente="true" />
+        <item name="Controle Interno Liquidação" file="" liberado-cliente="false" >
+          <item name="Liberação Inicial Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=1&amp;filtrovalor=1" liberado-cliente="false" />
+          <item name="Liberação Inicial" file="emp4_controleinternoliberacao.php?liberacaotipo=1" liberado-cliente="false" />
+          <item name="Liberação Final" file="emp4_controleinternoliberacao.php?liberacaotipo=2" liberado-cliente="false" />
+          <item name="Liberação Final Unidades" file="emp4_controleinternoliberacao.php?liberacaotipo=2&amp;filtrovalor=1" liberado-cliente="false" />
+          <item name="Emissão da Nota de Análise" file="emp4_documentocontroleinterno001.php" liberado-cliente="false" />
         </item>
       </menu>
     </menus>
